@@ -1,0 +1,9 @@
+RewriteEngine On
+RewriteBase /project/api/
+
+# Allow direct access to existing files and folders
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Route everything through index.php
+RewriteRule ^(.*)$ index.php/$1 [L]
