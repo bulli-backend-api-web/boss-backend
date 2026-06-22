@@ -1,0 +1,1 @@
+stock-inward-create.php

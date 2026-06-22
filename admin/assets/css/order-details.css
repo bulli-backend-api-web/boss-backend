@@ -1,0 +1,506 @@
+.order360-page{
+    background:#f5f7fb;
+    padding:14px;
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+    color:#111827;
+}
+
+.order360-page .row{
+    --bs-gutter-x: 14px;
+    --bs-gutter-y: 14px;
+}
+
+.o360-card{
+    background:#fff;
+    border:1px solid #e7ebf3;
+    border-radius:14px;
+    box-shadow:0 1px 2px rgba(16,24,40,.04);
+    overflow:hidden;
+    margin-bottom:14px;
+}
+
+.o360-card-header{
+    padding:14px 16px;
+    border-bottom:1px solid #edf1f7;
+    font-size:15px;
+    font-weight:700;
+    color:#111827;
+    background:#fff;
+}
+
+.o360-card-body{
+    padding:16px;
+}
+
+.o360-header-wrap{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:16px;
+}
+
+.o360-title-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:6px;
+}
+
+.o360-title{
+    margin:0;
+    font-size:18px;
+    font-weight:800;
+    color:#111827;
+}
+
+.o360-meta{
+    font-size:13px;
+    color:#6b7280;
+    font-weight:500;
+}
+
+.o360-section-title,
+.o360-summary-title,
+.o360-info-title{
+    font-size:14px;
+    font-weight:800;
+    color:#111827;
+}
+
+.o360-name{
+    font-size:16px;
+    font-weight:800;
+    color:#111827;
+    margin-bottom:6px;
+}
+
+.o360-info-line{
+    font-size:13px;
+    color:#374151;
+    line-height:1.6;
+    font-weight:500;
+}
+
+.o360-info-small,
+.o360-muted{
+    font-size:13px;
+    color:#4b5563;
+    line-height:1.7;
+    font-weight:500;
+}
+
+.o360-stat{
+    background:#fff;
+    border:1px solid #e7ebf3;
+    border-radius:12px;
+    padding:14px 16px;
+    min-height:98px;
+    box-shadow:0 1px 2px rgba(16,24,40,.03);
+}
+
+.o360-stat-title{
+    font-size:13px;
+    color:#6b7280;
+    font-weight:600;
+    margin-bottom:8px;
+}
+
+.o360-stat-value-lg{
+    font-size:20px;
+    line-height:1.2;
+    font-weight:800;
+    color:#111827;
+    margin-bottom:4px;
+}
+
+.o360-stat-value-md{
+    font-size:18px;
+    line-height:1.2;
+    font-weight:800;
+    color:#111827;
+    margin-bottom:4px;
+}
+
+.o360-stat-sub{
+    font-size:12px;
+    color:#6b7280;
+    font-weight:600;
+}
+
+.o360-badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:700;
+    line-height:1;
+    border:1px solid transparent;
+    white-space:nowrap;
+}
+
+.badge-green{
+    background:#eaf8ef;
+    color:#16a34a;
+    border-color:#cbeed6;
+}
+
+.badge-blue{
+    background:#eaf2ff;
+    color:#2563eb;
+    border-color:#d5e3ff;
+}
+
+.badge-purple{
+    background:#f1eaff;
+    color:#7c3aed;
+    border-color:#e2d6ff;
+}
+
+.badge-orange{
+    background:#fff6e8;
+    color:#d97706;
+    border-color:#fde4b2;
+}
+
+.badge-soft-blue{
+    background:#eef4ff;
+    color:#2563eb;
+    border-color:#d9e6ff;
+}
+
+.badge-health{
+    background:#eaf8ef;
+    color:#159947;
+    border:1px solid #cfead8;
+    padding:5px 12px;
+    font-size:12px;
+    font-weight:800;
+}
+
+.o360-icon-btn{
+    width:28px;
+    height:28px;
+    border-radius:50%;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    border:1px solid #dfe5ef;
+    background:#fff;
+    text-decoration:none;
+    font-size:13px;
+}
+
+.o360-icon-btn.whatsapp{
+    color:#16a34a;
+}
+
+.o360-cust-row .o360-cust-left{
+    border-right:1px dashed #e5e7eb;
+}
+
+.o360-cust-right{
+    padding-left:20px;
+}
+
+.o360-table{
+    width:100%;
+    margin:0;
+    border-collapse:collapse;
+}
+
+.o360-table thead th{
+    background:#fafbfc;
+    color:#4b5563;
+    font-size:12px;
+    font-weight:700;
+    padding:12px 14px;
+    border-bottom:1px solid #e8edf4;
+    white-space:nowrap;
+}
+
+.o360-table tbody td{
+    padding:14px;
+    font-size:13px;
+    color:#111827;
+    font-weight:600;
+    border-bottom:1px solid #edf1f7;
+    vertical-align:top;
+}
+
+.o360-product{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    min-width:220px;
+}
+
+.o360-product img{
+    width:52px;
+    height:64px;
+    object-fit:cover;
+    border-radius:8px;
+    border:1px solid #e5e7eb;
+    background:#f8fafc;
+}
+
+.o360-product-title{
+    font-size:14px;
+    font-weight:700;
+    color:#111827;
+    line-height:1.35;
+    margin-bottom:2px;
+}
+
+.o360-product-sub{
+    font-size:12px;
+    color:#6b7280;
+    font-weight:500;
+    margin-bottom:6px;
+}
+
+.o360-mini-tag{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    padding:3px 8px;
+    margin-right:6px;
+    margin-top:4px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:700;
+    color:#3b82f6;
+    background:#eef5ff;
+    border:1px solid #dbeafe;
+}
+
+.o360-list-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:8px;
+    font-size:13px;
+    color:#4b5563;
+    font-weight:500;
+}
+
+.o360-list-row strong{
+    color:#111827;
+    font-weight:700;
+}
+
+.o360-profit-box{
+    margin-top:14px;
+    background:#edf9ef;
+    border:1px solid #d5eed7;
+    border-radius:10px;
+    padding:16px;
+}
+
+.o360-profit-label{
+    font-size:13px;
+    font-weight:700;
+    color:#15803d;
+    margin-bottom:4px;
+}
+
+.o360-profit-value{
+    font-size:16px;
+    font-weight:800;
+    color:#15803d;
+}
+
+.o360-summary-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:8px;
+    padding:7px 0;
+    border-bottom:1px solid #f0f2f7;
+    font-size:13px;
+}
+
+.o360-summary-row span:first-child{
+    color:#6b7280;
+    font-weight:600;
+}
+
+.o360-summary-row strong{
+    color:#111827;
+    font-weight:800;
+}
+
+.o360-health-bar{
+    margin-top:10px;
+    height:8px;
+    border-radius:999px;
+    background:#ebeff5;
+    overflow:hidden;
+}
+
+.o360-health-bar span{
+    display:block;
+    width:78%;
+    height:100%;
+    background:#22c55e;
+    border-radius:999px;
+}
+
+.o360-side-btn{
+    display:flex;
+    align-items:center;
+    width:100%;
+    min-height:40px;
+    padding:0 14px;
+    margin-bottom:10px;
+    border:1px solid #e3e8f1;
+    border-radius:10px;
+    background:#fff;
+    color:#111827;
+    text-decoration:none;
+    font-size:13px;
+    font-weight:700;
+    transition:.2s ease;
+}
+
+.o360-side-btn:hover{
+    background:#f9fafb;
+    color:#111827;
+}
+
+.o360-alert{
+    font-size:13px;
+    color:#4b5563;
+    background:#fffdf5;
+    border:1px solid #f8ebc2;
+    border-radius:10px;
+    padding:10px 12px;
+    margin-bottom:10px;
+    font-weight:500;
+}
+
+.o360-note{
+    width:100%;
+    min-height:92px;
+    border:1px solid #e1e7f0;
+    border-radius:10px;
+    padding:12px;
+    outline:none;
+    resize:none;
+    font-size:13px;
+}
+
+.o360-note:focus{
+    border-color:#3b82f6;
+    box-shadow:0 0 0 3px rgba(59,130,246,.08);
+}
+
+.o360-journey{
+    position:relative;
+    padding-left:28px;
+}
+
+.o360-journey:before{
+    content:"";
+    position:absolute;
+    left:10px;
+    top:6px;
+    bottom:6px;
+    width:2px;
+    background:#d8e6fb;
+}
+
+.o360-journey-item{
+    position:relative;
+    padding-bottom:18px;
+}
+
+.o360-journey-item:before{
+    content:"";
+    position:absolute;
+    left:-28px;
+    top:3px;
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    border:3px solid #fff;
+    box-shadow:0 0 0 2px #22c55e;
+    background:#22c55e;
+}
+
+.o360-journey-item.processing:before{
+    background:#1d4ed8;
+    box-shadow:0 0 0 2px #1d4ed8;
+}
+
+.o360-journey-item.delivered:before{
+    background:#86efac;
+    box-shadow:0 0 0 2px #86efac;
+}
+
+.o360-journey-title{
+    font-size:14px;
+    font-weight:800;
+    color:#111827;
+    margin-bottom:2px;
+}
+
+.o360-journey-time{
+    font-size:12px;
+    color:#6b7280;
+    font-weight:600;
+}
+
+.o360-mini-status{
+    display:inline-block;
+    margin-left:6px;
+    padding:2px 7px;
+    border-radius:999px;
+    font-size:10px;
+    font-weight:800;
+    color:#16a34a;
+    background:#ecfdf3;
+    border:1px solid #d2f4dd;
+}
+
+.btn.btn-light-primary{
+    background:#eef4ff;
+    border:1px solid #d8e5ff;
+    color:#2563eb;
+    border-radius:8px;
+}
+
+.btn.btn-light-dark{
+    background:#f9fafb;
+    border:1px solid #e5e7eb;
+    color:#374151;
+    border-radius:8px;
+}
+
+
+
+@media (max-width:1199px){
+    .o360-cust-row .o360-cust-left{
+        border-right:none;
+        border-bottom:1px dashed #e5e7eb;
+        padding-bottom:14px;
+    }
+
+    .o360-cust-right{
+        padding-left:12px;
+        padding-top:10px;
+    }
+}
+
+@media (max-width:991px){
+    .o360-header-wrap{
+        flex-direction:column;
+    }
+
+    .o360-product{
+        min-width:unset;
+    }
+}

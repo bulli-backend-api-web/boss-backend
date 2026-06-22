@@ -1,0 +1,12 @@
+RewriteEngine On
+
+# Check if the requested file is not a directory or an existing file
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+
+# Rewrite URLs to append .php internally
+RewriteRule ^(.*)$ $1.php [L,QSA]
+
+# Optional: Redirect requests with .php to the clean URL without .php
+RewriteCond %{THE_REQUEST} \s/NEW-VASTRANAND/([^/]+)\.php [NC]
+RewriteRule ^ /NEW-VASTRANAND/%1 [R=301,L]

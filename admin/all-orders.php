@@ -1,0 +1,388 @@
+<?php
+include("config/database.php");
+include("config/auth_check.php");
+include("includes/sidemenu.php");
+$to_date = '';
+$from_date = '';
+$product_list = getAllProductList();
+
+$sql = "
+SELECT
+    COUNT(*) AS total_orders,
+    COUNT(CASE WHEN payment_method = 1 THEN 1 END) AS total_prepaid,
+    COUNT(CASE WHEN payment_method = 2 THEN 1 END) AS total_cod,
+    COUNT(CASE WHEN order_from = 1 THEN 1 END) AS bk_count,
+    COUNT(CASE WHEN order_from = 2 THEN 1 END) AS u3k_count,
+    COUNT(CASE WHEN tracking_number IS NOT NULL THEN 1 END) AS total_fulfillment FROM shopify_order";
+
+$stmt = $con->prepare($sql);
+
+if (!empty($whereData['params'])) {
+    $stmt->bind_param($whereData['types'], ...$whereData['params']);
+}
+
+$stmt->execute();
+
+$result = $stmt->get_result()->fetch_assoc();
+$total_orders = !empty($result['total_orders']) ? $result['total_orders'] : 0;
+$total_fulfillment = !empty($result['total_fulfillment']) ? $result['total_fulfillment'] : 0;
+$total_prepaid = !empty($result['total_prepaid']) ? $result['total_prepaid'] : 0;
+$total_cod = !empty($result['total_cod']) ? $result['total_cod'] : 0;
+$bk_count = !empty($result['bk_count']) ? $result['bk_count'] : 0;
+$u3k_count = !empty($result['u3k_count']) ? $result['u3k_count'] : 0;
+?>
+<style>
+    .dashboard-stat-card {
+    background: #fff;
+    border: 1px solid #e4d5c7;
+    border-radius: 15px;
+    padding: 22px;
+    min-height: 130px;
+    transition: all 0.3s ease;
+}
+
+.dashboard-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,.08);
+}
+
+.stat-title {
+    font-size: 13px;
+    letter-spacing: 1px;
+    font-weight: 600;
+    color: #8c6a3e;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.stat-value {
+    font-size: 42px;
+    font-weight: 500;
+    line-height: 1;
+    color: #c57b14;
+    margin-bottom: 10px;
+}
+
+.stat-desc {
+    font-size: 15px;
+    color: #9a8b7b;
+}
+</style>
+<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+    <div class="d-flex flex-column flex-column-fluid">
+        <div id="kt_app_toolbar" class="app-toolbar pt-7 pt-lg-10">
+            <div id="kt_app_toolbar_container" class="app-container container-fluid d-flex align-items-stretch">
+                <div class="app-toolbar-wrapper d-flex flex-stack flex-wrap gap-4 w-100">
+                    <div class="page-title d-flex flex-column justify-content-center gap-1 me-3">
+                        <h1 class="page-heading d-flex flex-column justify-content-center text-gray-900 fw-bold fs-3 m-0">All Order List</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="kt_app_content" class="app-content">
+            <div id="kt_app_content_container" class="app-container container-fluid">
+                <div class="card">
+                    <div class="card-header border-0 pt-6">
+                        <div class="row g-5 mb-8">
+                            <!-- Total Orders -->
+                            <div class="col-xl-3 col-md-6">
+                                <div class="dashboard-stat-card">
+                                    <div class="stat-title">TOTAL ORDERS</div>
+                                    <div class="stat-value">
+                                        <?php echo $total_orders; ?>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Fulfillment -->
+                            <div class="col-xl-3 col-md-6">
+                                <div class="dashboard-stat-card">
+                                    <div class="stat-title">TOTAL FULFILLMENT</div>
+                                    <div class="stat-value text-success">
+                                        <?php echo $total_fulfillment; ?>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Prepaid -->
+                            <div class="col-xl-3 col-md-6">
+                                <div class="dashboard-stat-card">
+                                    <div class="stat-title">TOTAL PREPAID</div>
+                                    <div class="stat-value text-primary">
+                                        <?php echo $total_prepaid; ?>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- COD -->
+                            <div class="col-xl-3 col-md-6">
+                                <div class="dashboard-stat-card">
+                                    <div class="stat-title">TOTAL COD</div>
+                                    <div class="stat-value text-warning">
+                                        <?php echo $total_cod; ?>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-xl-3 col-md-6">
+                                <div class="dashboard-stat-card">
+                                    <div class="stat-title">BK TOTAL ORDER</div>
+                                    <div class="stat-value text-warning">
+                                        <?php echo $bk_count; ?>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                             <div class="col-xl-3 col-md-6">
+                                <div class="dashboard-stat-card">
+                                    <div class="stat-title">U3K TOTAL ORDER</div>
+                                    <div class="stat-value text-warning">
+                                        <?php echo $u3k_count; ?>
+                                    </div>
+                                </div>
+                            </div>
+                            
+
+                        </div>
+                        <!--begin::Toolbar-->
+                        <div class="d-flex flex-wrap align-items-center gap-3 w-100">
+
+                            <!-- Search -->
+                            <div class="d-flex align-items-center position-relative flex-grow-1" style="max-width:320px;">
+                                <i class="ki-outline ki-magnifier fs-3 position-absolute ms-5"></i>
+                                <input type="text" class="form-control form-control-solid ps-12" placeholder="Search Order" data-kt-customer-table-filter="search"/>
+                            </div>
+
+                            <!-- Date Range -->
+                            <div class="w-auto">
+                                <button class="btn btn-light d-flex align-items-center" id="daterangeBtn">
+                                    <i class="ki-outline ki-calendar fs-3 me-2"></i>
+                                    <span id="reportrange">All</span>
+                                </button>
+                            </div>
+                            <div class="filter-item">
+                                <select id="payment_type" class="form-select form-select-solid" data-control="select2" data-hide-search="false" data-placeholder="Payment Type" data-kt-ecommerce-product-filter="Payment Type">
+                                    <option></option>
+                                    <option value="all">All</option>
+                                    <option value="1">Prepaid</option>
+                                    <option value="2">COD</option>
+                                </select>
+                            </div>
+                            <div class="filter-item">
+                                <select id="order_from" class="form-select form-select-solid" data-control="select2" data-hide-search="false" data-placeholder="Order From" data-kt-ecommerce-product-filter="Order From">
+                                    <option></option>
+                                    <option value="all">All</option>
+                                    <option value="1">Shopify</option>
+                                    <option value="2">U3K</option>
+                                    
+                                </select>
+                            </div>
+                            <div class="filter-item" style="width: 200px;">
+                                <select id="product_id" class="form-select form-select-solid" data-control="select2" data-hide-search="false" data-placeholder="Product" data-kt-ecommerce-product-filter="Product">
+                                    <option></option>
+                                    <?php foreach($product_list as $single_product){ ?>
+                                    <option value="<?php echo $single_product['id']; ?>"><?php echo $single_product['name']; ?></option>
+                                    <?php } ?>
+                                </select>
+                            </div>
+                            <div class="ms-auto">
+                                <button type="button" id="export_b2c_order_csv" class="btn btn-primary d-flex align-items-center">
+                                    <i class="ki-outline ki-exit-up fs-2 me-2"></i>
+                                    Export
+                                </button>
+                            </div>
+                        </div>
+                        <input type="hidden" id="from_date" name="from_date">
+                        <input type="hidden" id="to_date" name="to_date">
+                        <!--end::Toolbar-->
+
+                    </div>
+                    <div class="card-body py-4">
+                        <div class="table-responsive">
+                            <table class="table align-middle table-row-dashed table-row-gray-300 gy-5 gs-7" id="kt_customers_table">
+                                <thead  class="bg-light border-bottom">
+                                    <tr class="text-gray-700 fw-bold fs-7">
+                                        <th class="min-w-130px">Order ID</th>
+                                        <th class="min-w-130px">Order Date</th>
+                                        <th class="min-w-180px">Customer</th>
+                                        <th class="min-w-120px">Channel</th>
+                                        <th class="min-w-80px">Items</th>
+                                        <th class="min-w-80px">City</th>
+                                        <th class="min-w-80px">Pincode</th>
+                                        <th class="min-w-140px">Payment</th>
+                                        <th class="min-w-110px">Amount</th>
+                                        <th class="min-w-110px">Delivery</th>
+                                        <th class="min-w-110px">Status</th>
+                                        <th class="min-w-100px text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="fw-semibold text-gray-600">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php include("includes/footer.php"); ?>
+</div>
+</div>
+</div>
+</div>
+<script>var hostUrl = "<?php echo $site_path; ?>/assets/";</script>
+<script src="<?php echo $site_path; ?>/assets/plugins/global/plugins.bundle.js"></script>
+<script src="<?php echo $site_path; ?>/assets/js/scripts.bundle.js"></script>
+<script src="<?php echo $site_path; ?>/assets/plugins/custom/datatables/datatables.bundle.js"></script>
+<script>
+    "use strict";
+
+    $(document).ready(function () {
+        // Initialize DataTable
+        var table = $('#kt_customers_table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '<?php echo $site_path ?>/ajax/fetch-all-orders',
+                type: 'POST',
+                data: function (d) {
+                    d.ajax = 1;
+                    d.from_date = $('#from_date').val();
+                    d.to_date = $('#to_date').val();
+                    d.payment_type = $("#payment_type").val();
+                    d.order_from = $("#order_from").val();
+                    d.product_id = $("#product_id").val();
+                }
+            },
+
+            columns: [
+                {data: 'order_id'},
+                {data: 'order_date'},
+                {data: 'customer_name'},
+                {data: 'order_type'},
+                {data: 'items'},
+                {data: 'city'},
+                {data: 'pincode'},
+                {data: 'payment_type'},
+                {data: 'grand_total'},
+                {data: 'delivery_date'},
+                {data: 'status'},
+                {data: 'actions', orderable: false ,'className' : 'text-end'}
+            ],
+            pageLength: 50,
+            order: [[0, 'desc']], // default sort: Order Date descending
+            columnDefs: [
+                {targets: [0, 1, 2, 4, 5,6,7,8], orderable: true}, // allow sorting on these columns
+                {targets: [3], orderable: false} // actions column not sortable
+            ],
+            drawCallback: function () {
+                KTMenu.createInstances();
+            }
+        });
+
+        $('[data-kt-customer-table-filter="search"]').on('keyup', function () {
+            table.search(this.value).draw();
+        });
+
+        $('[data-kt-ecommerce-product-filter="Channel"]').on('keyup', function () {
+            table.search(this.value).draw();
+        });
+
+        //data-kt-ecommerce-product-filter
+
+        // Initialize KT Daterangepicker
+        const pickerEl = $('#daterangeBtn');
+        const displayEl = pickerEl.find('div.text-gray-600');
+
+        $(pickerEl).daterangepicker({
+            pens: 'left',
+            autoUpdateInput: false,
+            startDate: moment().startOf('month'),
+            endDate: moment().endOf('month'),
+            locale: {format: 'YYYY-MM-DD'},
+            ranges: {
+                'All': [null, null],
+                'Today': [moment(), moment()],
+                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, function (start, end, label) {
+            if (label === 'All') {
+                $('#from_date').val('');
+                $('#to_date').val('');
+                $('#reportrange').text('All');
+            } else {
+                $('#from_date').val(start.format('YYYY-MM-DD'));
+                $('#to_date').val(end.format('YYYY-MM-DD'));
+                $('#reportrange').text(
+                        start.format('MMM D, YYYY') + ' - ' + end.format('MMM D, YYYY')
+                        );
+            }
+
+            // reload DataTable
+            table.ajax.reload();
+        });
+        $('#from_date').val('');
+        $('#to_date').val('');
+        displayEl.text('All');
+
+        $("#payment_type").on('change', function () {
+            table.ajax.reload();
+        });
+
+        $("#order_from").on('change', function () {
+            table.ajax.reload();
+        });
+        
+        $("#product_id").on('change', function () {
+            table.ajax.reload();
+        });
+
+
+        $("#export_b2c_order_csv").on('click', function () {
+            var from_date = $("#from_date").val();
+            var to_date = $("#to_date").val();
+            var order_from = $("#order_from").val();
+            var payment_type = $("#payment_type").val();
+            var product_id = $("#product_id").val();
+            var $btn = $(this);
+            $btn.prop('disabled', true)
+                    .html('<span class="spinner-border spinner-border-sm align-middle me-2"></span>Generating report...');
+
+            $.ajax({
+                url: '<?php echo $site_path ?>/ajax/all-order-export-csv',
+                type: 'POST',
+                data: {'from_date': from_date, 'to_date': to_date, 'order_from': order_from, 'payment_type': payment_type},
+                xhrFields: {responseType: 'blob'},
+                success: function (blob) {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'all-order.csv';
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+                    $btn.prop('disabled', false)
+                            .html('Export');
+                },
+                error: function () {
+                    Swal.fire({
+                        text: 'Error generating CSV. Please try again.',
+                        icon: 'error',
+                        confirmButtonText: 'Ok, got it!',
+                        buttonsStyling: false,
+                        customClass: {
+                            confirmButton: 'btn fw-bold btn-primary'
+                        }
+                    });
+                }
+            });
+        });
+    });
+
+</script>
+</body>
+</html>

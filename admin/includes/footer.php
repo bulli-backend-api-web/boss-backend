@@ -1,7 +1,8 @@
-        </div><!-- /.content -->
-    </main>
-</div><!-- /.layout -->
-
-<script src="<?= SITE_URL ?>/assets/js/admin.js"></script>
-</body>
-</html>
+<div id="kt_app_footer" class="app-footer">
+    <div class="app-container container-fluid d-flex flex-column flex-md-row flex-center flex-md-stack py-3">
+        <div class="text-gray-900 order-2 order-md-1">
+            <span class="text-muted fw-semibold me-1"><?php echo date('Y'); ?>&copy;</span>
+            <a href="https://www.bullionknot.com/" target="_blank" class="text-gray-800 text-hover-primary">BulliOnKnot. All Rights Reserved.Powered by BulliOnKnot Pvt Ltd.</a>
+        </div>
+    </div>
+</div>

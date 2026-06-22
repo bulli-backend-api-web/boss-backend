@@ -5,7 +5,7 @@
 define('DB_HOST',     'localhost');
 define('DB_USER',     'root');
 define('DB_PASS',     '');
-define('DB_NAME',     'project_db');
+define('DB_NAME',     'bullionknot');
 define('DB_CHARSET',  'utf8mb4');
 
 define('SITE_URL',    'http://localhost/boss-backend/admin');

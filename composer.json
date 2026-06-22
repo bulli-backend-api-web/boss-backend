@@ -1,0 +1,6 @@
+{
+    "require": {
+        "aws/aws-sdk-php": "^3.356",
+        "google/auth": "^1.51"
+    }
+}

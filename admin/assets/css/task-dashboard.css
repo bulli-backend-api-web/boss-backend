@@ -1,0 +1,358 @@
+/* ─── Google Font ─── */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+
+/* ─── CSS Variables ─── */
+:root {
+    --bg: #f5f4f0;
+    --white: #ffffff;
+    --border: #e8e6e0;
+    --text: #1a1a1a;
+    --muted: #888888;
+    --shadow: 0 1px 4px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.05);
+}
+
+/* ─── Base ─── */
+#kt_app_main,
+#kt_app_main * {
+    font-family: 'DM Sans', sans-serif !important;
+}
+
+#kt_app_content {
+    background: var(--bg) !important;
+}
+
+/* ─── Toolbar ─── */
+.app-toolbar {
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+}
+
+/* ─── Stat Cards ─── */
+.dashboard-card {
+    border: 0 !important;
+    border-radius: 14px !important;
+    box-shadow: var(--shadow) !important;
+    background: var(--white) !important;
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+.dashboard-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 24px rgba(0,0,0,.10) !important;
+}
+.dashboard-card.overdue-card {
+    background: #fff5f5 !important;
+    border: 1px solid #fecaca !important;
+}
+.dashboard-card .card-body {
+    padding: 22px 24px !important;
+}
+.stat-label {
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: .06em !important;
+    color: var(--muted) !important;
+}
+.stats-value {
+    font-size: 38px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    margin: 10px 0 6px !important;
+}
+.stat-sub {
+    font-size: 12px !important;
+}
+
+/* ─── Section Cards ─── */
+.section-card {
+    border: 0 !important;
+    border-radius: 14px !important;
+    box-shadow: var(--shadow) !important;
+    background: var(--white) !important;
+}
+.section-card .card-header {
+    min-height: 56px !important;
+    border-bottom: 1px solid var(--border) !important;
+    background: var(--white) !important;
+    padding: 16px 22px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+.section-card .card-title {
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+}
+
+/* ─── View All Button ─── */
+.btn-view-all {
+    font-size: 12px;
+    color: var(--muted);
+    background: #f5f4f0;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 12px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: background .15s;
+    text-decoration: none;
+    display: inline-block;
+}
+.btn-view-all:hover {
+    background: var(--border);
+    color: var(--text);
+}
+
+/* ─── Overdue Table ─── */
+.overdue-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+}
+.overdue-table thead th {
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: .05em !important;
+    color: var(--muted) !important;
+    padding: 12px 22px !important;
+    background: #fafafa !important;
+    border-bottom: 1px solid var(--border) !important;
+    white-space: nowrap;
+}
+.overdue-table tbody td {
+    padding: 14px 22px !important;
+    border-bottom: 1px solid #f0eeea !important;
+    vertical-align: middle !important;
+    font-size: 13px !important;
+}
+.overdue-table tbody tr:last-child td {
+    border-bottom: none !important;
+}
+.overdue-table tbody tr:hover td {
+    background: #fafaf8;
+}
+.task-name {
+    font-weight: 600;
+    font-size: 13px !important;
+    color: var(--text);
+    margin-bottom: 2px;
+}
+.task-dept {
+    font-size: 11px !important;
+    color: var(--muted);
+}
+
+/* ─── Type Badges ─── */
+.badge-type {
+    display: inline-block;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    padding: 3px 10px;
+    border-radius: 20px;
+}
+.badge-daily    {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+.badge-weekly   {
+    background: #d1fae5;
+    color: #065f46;
+}
+.badge-monthly  {
+    background: #ede9fe;
+    color: #5b21b6;
+}
+.badge-specific {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+/* ─── Overdue Time ─── */
+.overdue-time {
+    font-weight: 700 !important;
+    color: #ef4444 !important;
+    font-size: 13px !important;
+}
+
+/* ─── View Button ─── */
+.btn-view {
+    font-size: 12px;
+    font-weight: 500;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 5px 14px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: background .15s;
+    white-space: nowrap;
+}
+.btn-view:hover {
+    background: #f5f4f0;
+}
+
+/* ─── Department List ─── */
+.dept-list {
+    padding: 6px 0;
+}
+.dept-item {
+    padding: 10px 20px;
+}
+.dept-row  {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.dept-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    flex-shrink: 0;
+}
+.dept-info  {
+    flex: 1;
+    min-width: 0;
+}
+.dept-name  {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+}
+.dept-sub   {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 1px;
+}
+.dept-pct   {
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+.dept-bar-track {
+    display: block !important;
+    width: 100% !important;
+    height: 5px !important;
+    background: #ebebeb !important;
+    border-radius: 99px !important;
+    overflow: visible !important;
+    margin-top: 8px !important;
+    position: relative !important;
+    box-shadow: none !important;
+}
+.dept-bar-fill {
+    display: block !important;
+    height: 5px !important;
+    border-radius: 99px !important;
+    position: relative !important;
+    box-shadow: none !important;
+}
+
+/* ─── Dept Icon Bg Colors ─── */
+.icon-blue   {
+    background: #eff6ff;
+}
+.icon-yellow {
+    background: #fefce8;
+}
+.icon-teal   {
+    background: #f0fdfa;
+}
+.icon-orange {
+    background: #fff7ed;
+}
+.icon-pink   {
+    background: #fdf2f8;
+}
+.icon-indigo {
+    background: #eef2ff;
+}
+.icon-lime   {
+    background: #f7fee7;
+}
+
+/* ─── Completion Section ─── */
+.completion-body {
+    padding: 22px 24px !important;
+}
+.comp-row {
+    margin-bottom: 22px;
+}
+.comp-row:last-child {
+    margin-bottom: 0;
+}
+.comp-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.comp-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.comp-count {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+}
+.progress-track {
+    display: block !important;
+    width: 100% !important;
+    height: 10px !important;
+    background: #ebebeb !important;
+    border-radius: 99px !important;
+    overflow: visible !important;
+    position: relative !important;
+    box-shadow: none !important;
+    /* reset Bootstrap overrides */
+    padding: 0 !important;
+    margin: 0 !important;
+}
+.progress-fill {
+    display: block !important;
+    height: 10px !important;
+    border-radius: 99px !important;
+    position: relative !important;
+    min-width: 0 !important;
+    box-shadow: none !important;
+    transition: width .5s ease !important;
+}
+.fill-blue   {
+    background: #3b82f6 !important;
+}
+.fill-purple {
+    background: #8b5cf6 !important;
+}
+.fill-green  {
+    background: #22c55e !important;
+}
+.fill-amber  {
+    background: #f59e0b !important;
+}
+
+/* ─── Completion Section Title (highlighted) ─── */
+.completion-title-bar {
+    background: #1e3a8a;
+    color: #fff;
+    padding: 12px 22px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 0;
+    display: inline-block;
+}
+.section-card .completion-header {
+    padding: 16px 22px !important;
+    border-bottom: 1px solid var(--border) !important;
+    background: var(--white) !important;
+}

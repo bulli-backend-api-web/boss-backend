@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-$config['base_url']             = 'http://localhost/project/api/';
+$config['base_url']             = 'http://localhost/boss-backend/api/';
 $config['index_page']           = '';
 $config['uri_protocol']         = 'REQUEST_URI';
 $config['url_suffix']           = '';
