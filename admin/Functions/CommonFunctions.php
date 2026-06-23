@@ -1428,8 +1428,75 @@ function get_module_class_by_category(){
 
 function generate_staff_code(){
     global $con;
+    $date = date('Y');
     $result = mysqli_query($con, "SELECT COUNT(*) AS total FROM staff_register");
     $row    = mysqli_fetch_assoc($result);
     $count  = (int) $row['total'];
-    return 'BK-' . str_pad($count + 1, 3, '0', STR_PAD_LEFT);
+    return 'BK-STF-'.$date."-". str_pad($count + 1, 3, '0', STR_PAD_LEFT);
+}
+
+function get_fabric_type_list(){
+    global $con;
+    $fabric_type_list = [];
+    $sql = "SELECT id,name from fabric_type order by name";
+    if ($stmt = mysqli_prepare($con, $sql)) {
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+
+        while ($row = mysqli_fetch_assoc($result)) {
+            $fabric_type_list[] = $row;
+        }
+
+        mysqli_stmt_close($stmt);
+    }
+    
+    return $fabric_type_list;
+}
+
+function get_register_staff_list() {
+    global $con;
+
+    $register_staff_list = [];
+
+    $sql  = "SELECT id, fullname FROM staff_register ORDER BY fullname ASC";
+    $stmt = $con->prepare($sql);
+
+    if (!$stmt) {
+        return $register_staff_list;
+    }
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    while ($row = $result->fetch_assoc()) {
+        $register_staff_list[] = $row;
+    }
+
+    $stmt->close();
+
+    return $register_staff_list;
+}
+
+function get_employment_type_list() {
+    global $con;
+
+    $employment_type_list = [];
+
+    $sql  = "SELECT id, name FROM employment_type ORDER BY id ASC";
+    $stmt = $con->prepare($sql);
+
+    if (!$stmt) {
+        return $employment_type_list;
+    }
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    while ($row = $result->fetch_assoc()) {
+        $employment_type_list[] = $row;
+    }
+
+    $stmt->close();
+
+    return $employment_type_list;
 }

@@ -16,7 +16,7 @@ $users_role = getUniqueRoles();
                     <!--begin::Page title-->
                     <div class="page-title d-flex flex-column justify-content-center gap-1 me-3">
                         <!--begin::Title-->
-                        <h1 class="page-heading d-flex flex-column justify-content-center text-gray-900 fw-bold fs-3 m-0">Outfit Style Type</h1>
+                        <h1 class="page-heading d-flex flex-column justify-content-center text-gray-900 fw-bold fs-3 m-0">Manage Jobwork Type</h1>
                         <!--end::Title-->
                         <!--begin::Breadcrumb-->
                         <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0">
@@ -31,7 +31,7 @@ $users_role = getUniqueRoles();
                             </li>
                             <!--end::Item-->
                             <!--begin::Item-->
-                            <li class="breadcrumb-item text-muted">Outfit Style Type</li>
+                            <li class="breadcrumb-item text-muted">Jobwork List</li>
                             <!--end::Item-->
 
                         </ul>
@@ -57,45 +57,38 @@ $users_role = getUniqueRoles();
                             <!--begin::Search-->
                             <div class="d-flex align-items-center position-relative my-1" style="margin-right: 15px;">
                                 <i class="ki-outline ki-magnifier fs-3 position-absolute ms-5"></i>
-                                <input type="text" data-kt-user-table-filter="search" class="form-control form-control-solid w-250px ps-13" placeholder="Search" />
+                                <input type="text" data-kt-user-table-filter="search" class="form-control form-control-solid w-250px ps-13" placeholder="Search Party" />
                             </div>
                         </div>
                         <div class="card-toolbar">
                             <div class="d-flex justify-content-end" data-kt-user-table-toolbar="base">
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_add_style">
-                                    <i class="ki-outline ki-plus fs-2"></i>Add Tag</button>
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_add_jobwork_type">
+                                    <i class="ki-outline ki-plus fs-2"></i>Add Jobwork Type</button>
                             </div>
-                            <div class="modal fade" id="kt_modal_add_style" tabindex="-1" aria-hidden="true">
-                                <!--begin::Modal dialog-->
+                            <div class="modal fade" id="kt_modal_add_jobwork_type" tabindex="-1" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered mw-650px">
-                                    <!--begin::Modal content-->
                                     <div class="modal-content">
-                                        <!--begin::Modal header-->
                                         <div class="modal-header" id="kt_modal_add_user_header">
-                                            <!--begin::Modal title-->
-                                            <h2 class="fw-bold">Add Style</h2>
-                                            <!--end::Modal title-->
-                                            <!--begin::Close-->
-                                            <div class="btn btn-icon btn-sm btn-active-icon-primary" data-kt-tag-modal-action="close">
+                                            <h2 class="fw-bold">Add Jobwork Type Details</h2>
+                                            <div class="btn btn-icon btn-sm btn-active-icon-primary" data-kt-jobwork-modal-action="close">
                                                 <i class="ki-outline ki-cross fs-1"></i>
                                             </div>
-                                            <!--end::Close-->
                                         </div>
-                                        <!--end::Modal header-->
-                                        <!--begin::Modal body-->
                                         <div class="modal-body px-5 my-7">
-                                            <!--begin::Form-->
-                                            <form id="kt_modal_add_tag_form" class="form" action="<?php echo $site_path; ?>/ajax/add-update-tag">
-                                                <!--begin::Scroll-->
+                                            <form id="kt_modal_add_jobwork_type_form" class="form" action="<?php echo $site_path; ?>/ajax/add-update-jobwork-type-details" enctype="multipart/form-data">
                                                 <div class="d-flex flex-column scroll-y px-5 px-lg-10" id="kt_modal_add_user_scroll" data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_add_user_header" data-kt-scroll-wrappers="#kt_modal_add_user_scroll" data-kt-scroll-offset="300px">
                                                     <div class="fv-row mb-7 fv-row">
                                                         <label class="required fw-semibold fs-6 mb-2">Name</label>
-                                                        <input type="text" name="style_name" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Style Name" value="" />
+                                                        <input type="text" name="jobwork_name" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Jobwork Name" value="" />
+                                                    </div>
+                                                    <div class="fv-row mb-7 fv-row">
+                                                        <label class="required fw-semibold fs-6 mb-2">Amount</label>
+                                                        <input type="text" name="amount" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Amount" value="" />
                                                     </div>
                                                 </div>
                                                 <div class="text-center pt-10">
-                                                    <button type="reset" class="btn btn-light me-3" data-kt-tag-modal-action="cancel">Discard</button>
-                                                    <button type="submit" class="btn btn-primary" data-kt-tag-modal-action="submit">
+                                                    <button type="reset" class="btn btn-light me-3" data-kt-jobwork-modal-action="cancel">Discard</button>
+                                                    <button type="submit" class="btn btn-primary" data-kt-jobwork-modal-action="submit">
                                                         <span class="indicator-label">Submit</span>
                                                         <span class="indicator-progress">Please wait... 
                                                             <span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
@@ -106,7 +99,7 @@ $users_role = getUniqueRoles();
                                     </div>
                                 </div>
                             </div>
-                            <div class="modal fade" id="kt_modal_update_tag" tabindex="-1" aria-hidden="true">
+                            <div class="modal fade" id="kt_modal_update_jobwork_type" tabindex="-1" aria-hidden="true">
                                 <!--begin::Modal dialog-->
                                 <div class="modal-dialog modal-dialog-centered mw-650px">
                                     <!--begin::Modal content-->
@@ -114,10 +107,10 @@ $users_role = getUniqueRoles();
                                         <!--begin::Modal header-->
                                         <div class="modal-header" id="kt_modal_add_user_header">
                                             <!--begin::Modal title-->
-                                            <h2 class="fw-bold">Update Channel</h2>
+                                            <h2 class="fw-bold">Update Jobwork Details</h2>
                                             <!--end::Modal title-->
                                             <!--begin::Close-->
-                                            <div class="btn btn-icon btn-sm btn-active-icon-primary" data-kt-update-tag-modal-action="close">
+                                            <div class="btn btn-icon btn-sm btn-active-icon-primary" data-kt-update-jobwork-modal-action="close">
                                                 <i class="ki-outline ki-cross fs-1"></i>
                                             </div>
                                             <!--end::Close-->
@@ -126,17 +119,52 @@ $users_role = getUniqueRoles();
                                         <!--begin::Modal body-->
                                         <div class="modal-body px-5 my-7">
                                             <!--begin::Form-->
-                                            <form id="kt_modal_update_style_form" class="form" action="<?php echo $site_path; ?>/ajax/add-update-tag">
+                                            <form id="kt_modal_update_jobwork_form" class="form" action="<?php echo $site_path; ?>/ajax/add-update-jobwork-type-details" enctype="multipart/form-data">
                                                 <!--begin::Scroll-->
                                                 <div class="d-flex flex-column scroll-y px-5 px-lg-10" id="kt_modal_add_user_scroll" data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_add_user_header" data-kt-scroll-wrappers="#kt_modal_add_user_scroll" data-kt-scroll-offset="300px">
                                                     <div class="fv-row mb-7 fv-row">
                                                         <label class="required fw-semibold fs-6 mb-2">Name</label>
-                                                        <input type="text" name="style_name" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Style Name" value="" />
+                                                        <input type="text" name="jobwork_name" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Jobwork Name" value="" />
+                                                    </div>
+                                                    <div class="fv-row mb-7 fv-row">
+                                                        <label class="required fw-semibold fs-6 mb-2">Amount</label>
+                                                        <input type="text" name="amount" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Amount" value="" />
+                                                    </div>
+                                                     <div class="fv-row mb-7">
+                                                        <label class="fs-6 fw-semibold mb-2">
+                                                        <span>Status</span>
+                                                        </label>
+                                                        <div class="col-md-12">
+                                                            <div class="row row-cols-1 row-cols-md-3 row-cols-lg-1 row-cols-xl-3 g-9" data-kt-buttons="true" data-kt-buttons-target="[data-kt-button='true']">
+                                                        <div class="col">
+                                                            <label class="btn btn-outline btn-outline-dashed btn-active-light-primary d-flex text-start p-6" data-kt-button="true">
+                                                                <span class="form-check form-check-custom form-check-solid form-check-sm align-items-start mt-1">
+                                                                    <input class="form-check-input" type="radio" name="status" value="1" />
+                                                                </span>
+                                                                <span class="ms-5">
+                                                                    <span class="fs-4 fw-bold text-gray-800 d-block">Active</span>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="col">
+                                                            <label class="btn btn-outline btn-outline-dashed btn-active-light-primary d-flex text-start p-6" data-kt-button="true">
+                                                                <span class="form-check form-check-custom form-check-solid form-check-sm align-items-start mt-1">
+                                                                    <input class="form-check-input" type="radio" name="status" value="0" />
+                                                                </span>
+                                                                <span class="ms-5">
+                                                                    <span class="fs-4 fw-bold text-gray-800 d-block">Inactive</span>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                        </div>
                                                     </div>
                                                 </div>
+                                                
+                                                
                                                 <div class="text-center pt-10">
-                                                    <button type="reset" class="btn btn-light me-3" data-kt-update-tag-modal-action="cancel">Discard</button>
-                                                    <button type="submit" class="btn btn-primary" data-kt-update-tag-modal-action="submit">
+                                                    <button type="reset" class="btn btn-light me-3" data-kt-update-jobwork-modal-action="cancel">Discard</button>
+                                                    <button type="submit" class="btn btn-primary" data-kt-update-jobwork-modal-action="submit">
                                                         <span class="indicator-label">Submit</span>
                                                         <span class="indicator-progress">Please wait... 
                                                             <span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
@@ -150,12 +178,15 @@ $users_role = getUniqueRoles();
                         </div>
                     </div>
                     <div class="card-body py-4">
-                        <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_tags_list">
-                            <thead>
+                        <div class="table-responsive">
+                        <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_jobwork_type_list">
+                                <thead class="bg-light border-bottom">
                                 <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
                                     <th class="min-w-100px">SR No.</th>
                                     <th class="min-w-100px">Name</th>
-                                    <th class="min-w-100px">Actions</th>
+                                    <th class="min-w-100px">Amount</th>
+                                    <th class="min-w-100px">Status</th>
+                                    <th class="text-end min-w-100px">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="text-gray-600 fw-semibold">
@@ -166,6 +197,7 @@ $users_role = getUniqueRoles();
             </div>
         </div>
     </div>
+    </div>
     <?php include("includes/footer.php"); ?>
 </div>
 </div>
@@ -175,59 +207,78 @@ $users_role = getUniqueRoles();
     <i class="ki-outline ki-arrow-up"></i>
 </div>
 
-update-channel.js<script>var hostUrl = "assets/";</script>
 <script src="<?php echo $site_path; ?>/assets/plugins/global/plugins.bundle.js"></script>
 <script src="<?php echo $site_path; ?>/assets/js/scripts.bundle.js"></script>
 <script src="<?php echo $site_path; ?>/assets/plugins/custom/datatables/datatables.bundle.js"></script>
-<script src="<?php echo $site_path; ?>/assets/js/custom/apps/user-management/users/list/table.js?v=<?php echo time(); ?>"></script>
-<script src="<?php echo $site_path; ?>/assets/js/custom/add-style.js?v=<?php echo time(); ?>"></script>
-<script src="<?php echo $site_path; ?>/assets/js/custom/update-style.js?v=<?php echo time(); ?>"></script>
+<script src="<?php echo $site_path; ?>/assets/js/custom/add-jobwork-details.js?v=<?php echo time(); ?>"></script>
+<script src="<?php echo $site_path; ?>/assets/js/custom/update-jobwork-details.js?v=<?php echo time(); ?>"></script>
 <script>
     $(document).ready(function () {
-        var table = $('#kt_tags_list').DataTable({
+        var table = $('#kt_jobwork_type_list').DataTable({
             destroy: true,
             processing: true,
             serverSide: true,
             ajax: {
-                url: '<?php echo $site_path ?>/ajax/fetch-tag-list',
+                url: '<?php echo $site_path ?>/ajax/fetch-jobwork-type-list',
                 type: 'POST'
             },
+
             columns: [
                 {data: 'sr_no'},
-                {data: 'name'},
-                {data: 'actions', orderable: false}
+                {data: 'namae'},
+                {data: 'amount'},
+                {data: 'status'},
+                {data: 'actions', orderable: false, className: "text-end"}
             ],
             pageLength: 50,
-            order: [[0, 'asc']],
+            order: [[0, 'desc']],
             columnDefs: [
-                {targets: [1], orderable: true},
-                {targets: [2], orderable: false}
-            ]
+                {targets: [1, 2], orderable: true},
+                {targets: [0,3,4], orderable: false}
+            ],
+            drawCallback: function () {
+                KTMenu.createInstances();
+            }
         });
         $('[data-kt-user-table-filter="search"]').on('keyup', function () {
             table.search(this.value).draw();
         });
         
-        $(document).on("click", ".edit-tag", function() {
+         $(document).on("click", ".edit-jobwork-type", function() {
             const id = $(this).data("id");
-            const name = $(this).data("name");
+            const jobwork_name = $(this).data("jobwork-name");
+            const amount = $(this).data("amount");
+            const status = $(this).data("status");
+
+            const form = $("#kt_modal_update_jobwork_form");
+            const modal = $("#kt_modal_update_jobwork_type");
+            form.find('input[name="jobwork_name"]').val(jobwork_name);
+            form.find('input[name="amount"]').val(amount);
             
+            modal.on('shown.bs.modal', function() {
+            const $radio = modal.find('input[name="status"][value="' + status + '"]');
 
-            const form = $("#kt_modal_update_style_form");
-            form.find('input[name="style_name"]').val(name);
+            if ($radio.length) {
+                modal.find('input[name="status"]').prop('checked', false);
+                modal.find('[data-kt-button="true"]').removeClass('active');
 
-            // add hidden field for id
+                // Trigger click to update KT button styling
+                $radio.trigger('click');
+            } else {
+                console.error("Radio input not found for status:", status);
+            }
+
             form.find('input[name="id"]').remove();
             form.append('<input type="hidden" name="id" value="'+id+'">');
+             });
         });
-    });
-    
-    $(document).on('click', '.delete_tag', function(e) {
+        
+        $(document).on('click', '.delete_jobwork', function(e) {
             e.preventDefault();
 
             const btn = this;
             const row = $(btn).closest("tr");
-            const tag_id = $(btn).data("id");
+            const job_id = $(btn).data("id");
             const action = $(btn).data("action");
             const userName = row.find("td").eq(1).text().trim() || "this user";
 
@@ -248,8 +299,8 @@ update-channel.js<script>var hostUrl = "assets/";</script>
                         url: action,
                         type: "POST",
                         data: {
-                            'tag_id': tag_id,
-                            'action': 'delete_tag'
+                            'job_id': job_id,
+                            'action': 'delete_jobwork'
                         },
                         dataType: "json",
                         success: function(res) {
@@ -263,7 +314,7 @@ update-channel.js<script>var hostUrl = "assets/";</script>
                                         confirmButton: "btn fw-bold btn-primary"
                                     }
                                 }).then(function() {
-                                    $('#kt_tags_list').DataTable().row(row).remove().draw();
+                                    $('#kt_table_users').DataTable().row(row).remove().draw();
                                     if (typeof a === 'function') a();
                                      window.location.reload();
                                 });
@@ -304,7 +355,7 @@ update-channel.js<script>var hostUrl = "assets/";</script>
                 }
             });
         });
-   
+    });
 
 </script>
 </body>

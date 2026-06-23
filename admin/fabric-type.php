@@ -16,7 +16,7 @@ $users_role = getUniqueRoles();
                     <!--begin::Page title-->
                     <div class="page-title d-flex flex-column justify-content-center gap-1 me-3">
                         <!--begin::Title-->
-                        <h1 class="page-heading d-flex flex-column justify-content-center text-gray-900 fw-bold fs-3 m-0">Outfit Style Type</h1>
+                        <h1 class="page-heading d-flex flex-column justify-content-center text-gray-900 fw-bold fs-3 m-0">Manage Fabric Type</h1>
                         <!--end::Title-->
                         <!--begin::Breadcrumb-->
                         <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0">
@@ -31,7 +31,7 @@ $users_role = getUniqueRoles();
                             </li>
                             <!--end::Item-->
                             <!--begin::Item-->
-                            <li class="breadcrumb-item text-muted">Outfit Style Type</li>
+                            <li class="breadcrumb-item text-muted">Fabric Type</li>
                             <!--end::Item-->
 
                         </ul>
@@ -62,10 +62,10 @@ $users_role = getUniqueRoles();
                         </div>
                         <div class="card-toolbar">
                             <div class="d-flex justify-content-end" data-kt-user-table-toolbar="base">
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_add_style">
-                                    <i class="ki-outline ki-plus fs-2"></i>Add Tag</button>
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_add_fabric_type">
+                                    <i class="ki-outline ki-plus fs-2"></i>Add Fabric Type</button>
                             </div>
-                            <div class="modal fade" id="kt_modal_add_style" tabindex="-1" aria-hidden="true">
+                            <div class="modal fade" id="kt_modal_add_fabric_type" tabindex="-1" aria-hidden="true">
                                 <!--begin::Modal dialog-->
                                 <div class="modal-dialog modal-dialog-centered mw-650px">
                                     <!--begin::Modal content-->
@@ -73,10 +73,10 @@ $users_role = getUniqueRoles();
                                         <!--begin::Modal header-->
                                         <div class="modal-header" id="kt_modal_add_user_header">
                                             <!--begin::Modal title-->
-                                            <h2 class="fw-bold">Add Style</h2>
+                                            <h2 class="fw-bold">Add Fabric Type</h2>
                                             <!--end::Modal title-->
                                             <!--begin::Close-->
-                                            <div class="btn btn-icon btn-sm btn-active-icon-primary" data-kt-tag-modal-action="close">
+                                            <div class="btn btn-icon btn-sm btn-active-icon-primary" data-kt-fabric-type-modal-action="close">
                                                 <i class="ki-outline ki-cross fs-1"></i>
                                             </div>
                                             <!--end::Close-->
@@ -85,17 +85,17 @@ $users_role = getUniqueRoles();
                                         <!--begin::Modal body-->
                                         <div class="modal-body px-5 my-7">
                                             <!--begin::Form-->
-                                            <form id="kt_modal_add_tag_form" class="form" action="<?php echo $site_path; ?>/ajax/add-update-tag">
+                                            <form id="kt_modal_add_fabric_type_form" class="form" action="<?php echo $site_path; ?>/ajax/add-update-fabric-type">
                                                 <!--begin::Scroll-->
                                                 <div class="d-flex flex-column scroll-y px-5 px-lg-10" id="kt_modal_add_user_scroll" data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_add_user_header" data-kt-scroll-wrappers="#kt_modal_add_user_scroll" data-kt-scroll-offset="300px">
                                                     <div class="fv-row mb-7 fv-row">
                                                         <label class="required fw-semibold fs-6 mb-2">Name</label>
-                                                        <input type="text" name="style_name" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Style Name" value="" />
+                                                        <input type="text" name="fabric_type" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Fabric Type" value="" />
                                                     </div>
                                                 </div>
                                                 <div class="text-center pt-10">
-                                                    <button type="reset" class="btn btn-light me-3" data-kt-tag-modal-action="cancel">Discard</button>
-                                                    <button type="submit" class="btn btn-primary" data-kt-tag-modal-action="submit">
+                                                    <button type="reset" class="btn btn-light me-3" data-kt-fabric-type-modal-action="cancel">Discard</button>
+                                                    <button type="submit" class="btn btn-primary" data-kt-fabric-type-modal-action="submit">
                                                         <span class="indicator-label">Submit</span>
                                                         <span class="indicator-progress">Please wait... 
                                                             <span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
@@ -106,7 +106,7 @@ $users_role = getUniqueRoles();
                                     </div>
                                 </div>
                             </div>
-                            <div class="modal fade" id="kt_modal_update_tag" tabindex="-1" aria-hidden="true">
+                            <div class="modal fade" id="kt_modal_update_fabric_type" tabindex="-1" aria-hidden="true">
                                 <!--begin::Modal dialog-->
                                 <div class="modal-dialog modal-dialog-centered mw-650px">
                                     <!--begin::Modal content-->
@@ -114,10 +114,10 @@ $users_role = getUniqueRoles();
                                         <!--begin::Modal header-->
                                         <div class="modal-header" id="kt_modal_add_user_header">
                                             <!--begin::Modal title-->
-                                            <h2 class="fw-bold">Update Channel</h2>
+                                            <h2 class="fw-bold">Update Fabric Type</h2>
                                             <!--end::Modal title-->
                                             <!--begin::Close-->
-                                            <div class="btn btn-icon btn-sm btn-active-icon-primary" data-kt-update-tag-modal-action="close">
+                                            <div class="btn btn-icon btn-sm btn-active-icon-primary" data-kt-update-fabric-type-modal-action="close">
                                                 <i class="ki-outline ki-cross fs-1"></i>
                                             </div>
                                             <!--end::Close-->
@@ -126,17 +126,17 @@ $users_role = getUniqueRoles();
                                         <!--begin::Modal body-->
                                         <div class="modal-body px-5 my-7">
                                             <!--begin::Form-->
-                                            <form id="kt_modal_update_style_form" class="form" action="<?php echo $site_path; ?>/ajax/add-update-tag">
+                                            <form id="kt_modal_update_fabric_type_form" class="form" action="<?php echo $site_path; ?>/ajax/add-update-fabric-type">
                                                 <!--begin::Scroll-->
                                                 <div class="d-flex flex-column scroll-y px-5 px-lg-10" id="kt_modal_add_user_scroll" data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_add_user_header" data-kt-scroll-wrappers="#kt_modal_add_user_scroll" data-kt-scroll-offset="300px">
                                                     <div class="fv-row mb-7 fv-row">
                                                         <label class="required fw-semibold fs-6 mb-2">Name</label>
-                                                        <input type="text" name="style_name" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Style Name" value="" />
+                                                        <input type="text" name="fabric_type" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Fabric Type" value="" />
                                                     </div>
                                                 </div>
                                                 <div class="text-center pt-10">
-                                                    <button type="reset" class="btn btn-light me-3" data-kt-update-tag-modal-action="cancel">Discard</button>
-                                                    <button type="submit" class="btn btn-primary" data-kt-update-tag-modal-action="submit">
+                                                    <button type="reset" class="btn btn-light me-3" data-kt-update-fabric-type-modal-action="cancel">Discard</button>
+                                                    <button type="submit" class="btn btn-primary" data-kt-update-fabric-type-modal-action="submit">
                                                         <span class="indicator-label">Submit</span>
                                                         <span class="indicator-progress">Please wait... 
                                                             <span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
@@ -150,7 +150,7 @@ $users_role = getUniqueRoles();
                         </div>
                     </div>
                     <div class="card-body py-4">
-                        <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_tags_list">
+                        <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_fabric_type_list">
                             <thead>
                                 <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
                                     <th class="min-w-100px">SR No.</th>
@@ -175,21 +175,21 @@ $users_role = getUniqueRoles();
     <i class="ki-outline ki-arrow-up"></i>
 </div>
 
-update-channel.js<script>var hostUrl = "assets/";</script>
+<script>var hostUrl = "assets/";</script>
 <script src="<?php echo $site_path; ?>/assets/plugins/global/plugins.bundle.js"></script>
 <script src="<?php echo $site_path; ?>/assets/js/scripts.bundle.js"></script>
 <script src="<?php echo $site_path; ?>/assets/plugins/custom/datatables/datatables.bundle.js"></script>
 <script src="<?php echo $site_path; ?>/assets/js/custom/apps/user-management/users/list/table.js?v=<?php echo time(); ?>"></script>
-<script src="<?php echo $site_path; ?>/assets/js/custom/add-style.js?v=<?php echo time(); ?>"></script>
-<script src="<?php echo $site_path; ?>/assets/js/custom/update-style.js?v=<?php echo time(); ?>"></script>
+<script src="<?php echo $site_path; ?>/assets/js/custom/add-fabric-type.js?v=<?php echo time(); ?>"></script>
+<script src="<?php echo $site_path; ?>/assets/js/custom/update-fabric-type.js?v=<?php echo time(); ?>"></script>
 <script>
     $(document).ready(function () {
-        var table = $('#kt_tags_list').DataTable({
+        var table = $('#kt_fabric_type_list').DataTable({
             destroy: true,
             processing: true,
             serverSide: true,
             ajax: {
-                url: '<?php echo $site_path ?>/ajax/fetch-tag-list',
+                url: '<?php echo $site_path ?>/ajax/fetch-fabric-type-list',
                 type: 'POST'
             },
             columns: [
@@ -208,13 +208,13 @@ update-channel.js<script>var hostUrl = "assets/";</script>
             table.search(this.value).draw();
         });
         
-        $(document).on("click", ".edit-tag", function() {
+        $(document).on("click", ".edit-fabric-type", function() {
             const id = $(this).data("id");
             const name = $(this).data("name");
             
 
-            const form = $("#kt_modal_update_style_form");
-            form.find('input[name="style_name"]').val(name);
+            const form = $("#kt_modal_update_fabric_type_form");
+            form.find('input[name="fabric_type"]').val(name);
 
             // add hidden field for id
             form.find('input[name="id"]').remove();
@@ -222,12 +222,12 @@ update-channel.js<script>var hostUrl = "assets/";</script>
         });
     });
     
-    $(document).on('click', '.delete_tag', function(e) {
+    $(document).on('click', '.delete_ftype', function(e) {
             e.preventDefault();
 
             const btn = this;
             const row = $(btn).closest("tr");
-            const tag_id = $(btn).data("id");
+            const ftype_id = $(btn).data("id");
             const action = $(btn).data("action");
             const userName = row.find("td").eq(1).text().trim() || "this user";
 
@@ -248,8 +248,8 @@ update-channel.js<script>var hostUrl = "assets/";</script>
                         url: action,
                         type: "POST",
                         data: {
-                            'tag_id': tag_id,
-                            'action': 'delete_tag'
+                            'ftype_id': ftype_id,
+                            'action': 'delete_fabric_type'
                         },
                         dataType: "json",
                         success: function(res) {

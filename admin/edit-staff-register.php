@@ -7,6 +7,58 @@ $emp_id = generate_staff_code();
 $department_list = getAllDepartments();
 $role_list = getUniqueRoles();
 $employment_type_list = get_employment_type_list();
+$id = my_simple_crypt($_GET['id'], 'decrypt_1');
+if ($id > 0) {
+    $stmt = $con->prepare("SELECT * FROM staff_register WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+
+    if ($result && $result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $employee_code = $row['employee_code'];
+        $firstname = $row['firstname'];
+        $middlename = $row['middlename'];
+        $lastname = $row['lastname'];
+        $mobile_number = $row['mobile_number'];
+        $email = $row['email'];
+        $gender = $row['gender'];
+        $address = $row['address'];
+        $dob = $row['dob'];
+        $doj = $row['doj'];
+        $employment_type = $row['employment_type'];
+        $contract_start = $row['contract_start'];
+        $contract_end = $row['contract_end'];
+        $profile_picture = $row['profile_picture'];
+        $emergancy_contact_person = $row['emergancy_contact_person'];
+        $emergancy_contact_number = $row['emergancy_contact_number'];
+        $department_id  = $row['department_id'];
+        $is_department_head  = $row['is_department_head'];
+        $role_id  = $row['role_id'];
+        $work_location  = $row['work_location'];
+        $is_bond_applicable  = $row['is_bond_applicable'];
+        $bond_tenure  = $row['bond_tenure'];
+        $bond_amount  = $row['bond_amount'];
+        $bond_doc  = $row['bond_doc'];
+        $prevoius_work_history  = $row['prevoius_work_history'];
+        $increment_basis  = $row['increment_basis'];
+        $first_increment_after  = $row['first_increment_after'];
+        $increment_frequency  = $row['increment_frequency'];
+        $periodic_reminder_days  = $row['periodic_reminder_days'];
+        $review_cycle  = $row['review_cycle'];
+        $performance_score  = $row['performance_score'];
+        $performance_reminder_days  = $row['performance_reminder_days'];
+        $blood_group  = $row['blood_group'];
+        $aadhar_number  = $row['aadhar_number'];
+        $aadhaar_name  = $row['aadhaar_name'];
+        $aadhar_front_image  = $row['aadhar_front_image'];
+        $aadhar_back_image  = $row['aadhar_back_image'];
+    }
+
+    $stmt->close();
+
+}
 ?>
 <link href="<?php echo $site_path; ?>/assets/css/staff-register.css?v=<?php echo time(); ?>" rel="stylesheet" type="text/css" />
 <div class="app-main flex-column flex-row-fluid" id="kt_app_main">
@@ -36,8 +88,9 @@ $employment_type_list = get_employment_type_list();
 
         <div id="kt_app_content" class="app-content flex-column-fluid">
             <div id="kt_app_content_container" class="app-container container-xxl">
-                <form id="regForm" class="form staff-form" action="<?php echo $site_path; ?>/ajax/add-update-staff-details">
+                <form id="updateForm" class="form staff-form" action="<?php echo $site_path; ?>/ajax/add-update-staff-details">
                     <input type="hidden" name="previous_employers" id="previous_employers">
+                    <input type="hidden" name="staff_id" value="<?php echo $id; ?>"/>
                     <input type="hidden" name="redirect_url" value="<?php echo $site_path; ?>/staff-registry"/>
                     <div class="card" id="sec1">
                         <div class="card-header">
@@ -51,32 +104,32 @@ $employment_type_list = get_employment_type_list();
                             <div class="row col-3">
                                 <div class="fv-row field mb-4">
                                     <label>First Name <span class="req">*</span></label>
-                                    <input type="text" id="firstName" name="firstName" placeholder="e.g. Valentina" class="form-control form-control-lg form-control-solid" required/>
+                                    <input type="text" id="firstName" name="firstName" placeholder="e.g. Valentina" class="form-control form-control-lg form-control-solid" value="<?php echo $firstname; ?>"/>
                                     <span class="field-error">First name is required</span>
                                 </div>
                                 <div class="fv-row field mb-4">
                                     <label>Middle Name</label>
-                                    <input type="text" id="middleName" name="middleName" placeholder="Middle Name" class="form-control form-control-lg form-control-solid"/>
+                                    <input type="text" id="middleName" name="middleName" placeholder="Middle Name" class="form-control form-control-lg form-control-solid" value="<?php echo $middlename; ?>"/>
                                 </div>
                                 <div class="fv-row field mb-4">
                                     <div class="fav-row field mb-4">
                                         <label>Last Name <span class="req">*</span></label>
-                                        <input type="text" id="lastname" name="lastname" placeholder="Last Name" class="form-control form-control-lg form-control-solid"/>
+                                        <input type="text" id="lastname" name="lastname" placeholder="Last Name" class="form-control form-control-lg form-control-solid" value="<?php echo $lastname; ?>"/>
                                     </div>
                                 </div>
                             </div>
                             <div class="row col-3">
                                 <div class="field fv-row mb-4">
                                     <label>Date of Birth <span class="req">*</span></label>
-                                    <input type="date" id="dob" name="dob" class="form-control form-control-lg form-control-solid"/>
+                                    <input type="date" id="dob" name="dob" class="form-control form-control-lg form-control-solid" value="<?php echo $dob; ?>"/>
                                 </div>
-                                <div class="field fv-row mb-4" id="f-gender">
+                                <div class="field fv-row mb-4">
                                     <label>Gender <span class="req">*</span></label>
                                     <select id="gender" name="gender" class="form-control form-control-lg form-control-solid">
                                         <option value="">Select Gender</option>
-                                        <option value="Male">Male</option>
-                                        <option value="Female">Female</option>
-                                        <option value="Other">Other</option>
+                                        <option value="Male" <?php if($gender == 'Male') { echo 'selected';} ?>>Male</option>
+                                        <option value="Female" <?php if($gender == 'Female') { echo 'selected';} ?>>Female</option>
+                                        <option value="Other" <?php if($gender == 'Other') { echo 'selected';} ?>>Female</option>
                                     </select>
                                     <span class="field-error">Gender is required</span>
                                 </div>
@@ -84,43 +137,44 @@ $employment_type_list = get_employment_type_list();
                                     <label>Blood Group</label>
                                     <select id="blood_group" name="blood_group" class="form-control form-control-lg form-control-solid">
                                         <option value="">Select</option>
-                                        <option value="A+">A+</option>
-                                        <option value="A-">A-</option>
-                                        <option value="B+">B+</option>
-                                        <option value="B-">B-</option>
-                                        <option value="O+">O+</option>
-                                        <option value="O-">O-</option>
-                                        <option value="AB+">AB+</option>
-                                        <option value="AB-">AB-</option>
+                                        <option value="A+" <?php if($blood_group == 'A+') { echo 'selected';} ?>>A+</option>
+                                        <option value="A-" <?php if($blood_group == 'A-') { echo 'selected';} ?>>A-</option>
+                                        <option value="B+" <?php if($blood_group == 'B+') { echo 'selected';} ?>>B+</option>
+                                        <option value="B-" <?php if($blood_group == 'B-') { echo 'selected';} ?>>B-</option>
+                                        <option value="O+" <?php if($blood_group == 'O+') { echo 'selected';} ?>>O+</option>
+                                        <option value="O-" <?php if($blood_group == 'O-') { echo 'selected';} ?>>O-</option>
+                                        <option value="AB+" <?php if($blood_group == 'AB+') { echo 'selected';} ?>>AB+</option>
+                                        <option value="AB-" <?php if($blood_group == 'AB-') { echo 'selected';} ?>>AB-</option>
                                     </select>
+                                    <span class="field-error">Gender is required</span>
                                 </div>
                             </div>
                             <div class="row col-2">
                                 <div class="field fv-row mb-4" id="f-mobile1">
                                     <label>Mobile <span class="req">*</span></label>
-                                    <input type="tel" id="mobile1" name="mobile1" placeholder="+91 98765 43210" class="form-control form-control-lg form-control-solid"/>
+                                    <input type="tel" id="mobile1" name="mobile1" placeholder="+91 98765 43210" class="form-control form-control-lg form-control-solid" value="<?php echo $mobile_number; ?>"/>
                                     <span class="field-error">Mobile Number is required</span>
                                 </div>
                                  <div class="field fv-row mb-4"  id="f-email">
                                      <label>Email</label>
-                                    <input type="email" id="email" name="email" placeholder="model@email.com" class="form-control form-control-lg form-control-solid"/>
+                                    <input type="email" id="email" name="email" placeholder="model@email.com" class="form-control form-control-lg form-control-solid" value="<?php echo $email; ?>"/>
                                     <span class="field-error">Enter a valid email address</span>
                                 </div>
                             </div>
                             <div class="row col-full">
                                 <div class="field fv-row mb-2">
                                     <label>Current Address <span class="req">*</span></label>
-                                    <textarea id="address" name="address" placeholder="Flat / House No., Building, Street, Area…" rows="2" class="form-control form-control-lg form-control-solid"></textarea>
+                                    <textarea id="address" name="address" placeholder="Flat / House No., Building, Street, Area…" rows="2" class="form-control form-control-lg form-control-solid"><?php echo $address; ?></textarea>
                                 </div>
                             </div>
                             <div class="row col-2">
                                 <div class="fv-row field mb-2">
                                     <label>Emergency contact name <span class="req">*</span></label>
-                                    <input type="text" id="emergancy_name" name="emergancy_name" placeholder="Emergancy Contact Name" class="form-control form-control-lg form-control-solid">
+                                    <input type="text" id="emergancy_name" name="emergancy_name" placeholder="Emergancy Contact Name" class="form-control form-control-lg form-control-solid" value="<?php echo $emergancy_contact_number; ?>">
                                 </div>
                                 <div class="fv-row field mb-4">
                                     <label>Emergency contact phone <span class="req">*</span></label>
-                                    <input type="text" id="emergancy_phone" name="emergancy_phone" placeholder="Emergancy Contact Phone" class="form-control form-control-lg form-control-solid"/>
+                                    <input type="text" id="emergancy_phone" name="emergancy_phone" placeholder="Emergancy Contact Phone" class="form-control form-control-lg form-control-solid" value="<?php echo $emergancy_contact_number; ?>"/>
                                 </div>
                             </div>
                         </div>
@@ -143,21 +197,17 @@ $employment_type_list = get_employment_type_list();
                                         <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#departmentModal" class="quick-add-link"> + Quick Add</a>
                                     </div>
 
-                                    <select id="department_id"
-                                            name="department_id"
-                                            class="form-control form-control-lg form-control-solid">
+                                    <select id="department_id" name="department_id" class="form-control form-control-lg form-control-solid">
                                         <option value="">Select department</option>
-
                                         <?php foreach($department_list as $dept){ ?>
-                                            <option value="<?= $dept['id'] ?>">
+                                            <option value="<?= $dept['id'] ?>" <?php if($department_id == $dept['id']) { echo 'selected';} ?>>
                                                 <?= $dept['department_name'] ?>
                                             </option>
                                         <?php } ?>
                                     </select>
 
                                 </div>
-                                <div class="field fv-row mb-4" id="f-gender">
-                                    
+                                <div class="field fv-row mb-4">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <label>Role / Designation <span class="req">*</span></label>
                                         <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#roleModal" class="quick-add-link"> + Quick Add</a>
@@ -166,34 +216,34 @@ $employment_type_list = get_employment_type_list();
                                         <option value="">Select role</option>
                                         <?php if($role_list){
                                                 foreach($role_list as $single_role){?>
-                                                    <option value="<?php echo $single_role['id']; ?>"><?php echo $single_role['role_name']; ?></option>
+                                                    <option value="<?php echo $single_role['id']; ?>" <?php if($role_id == $single_role['id']) { echo 'selected';} ?>><?php echo $single_role['role_name']; ?></option>
                                         <?php } } ?>
                                     </select>
                                     <span class="field-error">Gender is required</span>
                                 </div>
                             </div>
                             <div class="row col-2">
-                                <div class="field fv-row mb-4" id="f-gender">
+                                <div class="field fv-row mb-4">
                                     <label>Is Department Head <span class="req">*</span></label>
                                     <div class="increment-tabs">
-                                        <button type="button" class="dept-head" data-type="yes">
+                                        <button type="button" class="dept-head <?php if($is_department_head == 1) { echo 'active';} ?>" data-type="yes" >
                                             Yes — dept head
                                         </button>
 
-                                        <button type="button" class="active dept-head" data-type="no">
+                                        <button type="button" class="<?php if($is_department_head == 0) { echo 'active';} ?> dept-head" data-type="no">
                                             No
                                         </button>
                                     </div>
                                 </div>
-                                <div class="field fv-row mb-4" id="f-gender">
+                                <div class="field fv-row mb-4">
                                     <div class="field fv-row mb-4">
                                     <label>Date of Join <span class="req">*</span></label>
-                                    <input type="date" id="doj" name="doj" class="form-control form-control-lg form-control-solid"/>
+                                    <input type="date" id="doj" name="doj" class="form-control form-control-lg form-control-solid" value="<?php echo $doj; ?>"/>
                                 </div>
                                 </div>
                             </div>
                             <div class="row col-2">
-                                <div class="field fv-row mb-4" id="f-gender">
+                                <div class="field fv-row mb-4">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <label>Employment <span class="req">*</span></label>
                                         <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#employmentTypeModal" class="quick-add-link"> + Quick Add</a>
@@ -201,17 +251,16 @@ $employment_type_list = get_employment_type_list();
                                     <select id="employment_type" name="employment_type" class="form-control form-control-lg form-control-solid">
                                         <?php if($employment_type_list){
                                                 foreach($employment_type_list as $single_val){?>
-                                                    <option value="<?php echo $single_val['id']; ?>"><?php echo $single_val['name']; ?></option>
+                                                    <option value="<?php echo $single_val['id']; ?>" <?php if($employment_type == $single_val['id']) { echo 'selected';} ?>><?php echo $single_val['name']; ?></option>
                                         <?php } } ?>
                                     </select>
-                                    <span class="field-error">Gender is required</span>
                                 </div>
-                                <div class="field fv-row mb-4" id="f-gender">
+                                <div class="field fv-row mb-4">
                                     <label>Work location</label>
                                     <select id="work_location" name="work_location" class="form-control form-control-lg form-control-solid">
-                                        <option>BullionKnot Factory, Surat</option>
-                                        <option>BullionKnot Office, Surat</option>
-                                        <option>Remote (with approval)</option>
+                                        <option <?php if($work_location == 'BullionKnot Factory, Surat') { echo 'selected';} ?>>BullionKnot Factory, Surat</option>
+                                        <option <?php if($work_location == 'BullionKnot Office, Surat') { echo 'selected';} ?>>BullionKnot Office, Surat</option>
+                                        <option <?php if($work_location == 'Remote (with approval)') { echo 'selected';} ?>>Remote (with approval)</option>
                                     </select>
                                 </div>
                             </div>
@@ -236,7 +285,15 @@ $employment_type_list = get_employment_type_list();
                                         <div class="upload-title">Upload ID Proof</div>
                                     </label>
                                     <div id="profile-preview">
-                                        
+                                        <?php if(!empty($profile_picture)){ ?>
+                                                <img
+                                                    src="<?php echo $define_company_website; ?>/uploads/staff/<?php echo $profile_picture; ?>"
+                                                    alt="Profile Picture"
+                                                    style="max-width:200px;
+                                                           border:1px solid #ddd;
+                                                           border-radius:8px;
+                                                           padding:5px;">
+                                            <?php } ?>
                                     </div>
                                 </div>
                             </div>
@@ -254,11 +311,11 @@ $employment_type_list = get_employment_type_list();
                             <div class="row col-2">
                                 <div class="fv-row field mb-4">
                                     <label>Aadhaar number <span class="req">*</span></label>
-                                    <input type="text" id="aadhaar_no" name="aadhaar_no" placeholder="XXX XXX XXX" maxlength="14" class="form-control form-control-lg form-control-solid"/>
+                                    <input type="text" id="aadhaar_no" name="aadhaar_no" placeholder="XXX XXX XXX" maxlength="14" class="form-control form-control-lg form-control-solid" value="<?php echo $aadhar_number; ?>"/>
                                 </div>
                                 <div class="fv-row field mb-4">
                                     <label>Name as on Aadhaar <span class="req">*</span></label>
-                                    <input type="text" id="aadhaar_name" name="aadhaar_name" placeholder="Aadhar Name" class="form-control form-control-lg form-control-solid"/>
+                                    <input type="text" id="aadhaar_name" name="aadhaar_name" placeholder="Aadhar Name" class="form-control form-control-lg form-control-solid" value="<?php echo $aadhaar_name; ?>"/>
                                 </div>
                             </div>
                             <div class="row col-2">
@@ -269,8 +326,16 @@ $employment_type_list = get_employment_type_list();
                                         <div class="upload-icon">📷</div>
                                         <div class="upload-title">Upload Aadhar Front</div>
                                     </label>
-                                    <div id="profile-preview">
-                                        
+                                    <div id="adhar-front-preview">
+                                        <?php if(!empty($aadhar_front_image)){ ?>
+                                                <img
+                                                    src="<?php echo $define_company_website; ?>/uploads/staff/documents/<?php echo $aadhar_front_image; ?>"
+                                                    alt="Profile Picture"
+                                                    style="max-width:200px;
+                                                           border:1px solid #ddd;
+                                                           border-radius:8px;
+                                                           padding:5px;">
+                                            <?php } ?>
                                     </div>
                                 </div>
                                 <div class="field mb-4">
@@ -280,8 +345,16 @@ $employment_type_list = get_employment_type_list();
                                         <div class="upload-icon">📷</div>
                                         <div class="upload-title">Upload Aadhar Back</div>
                                     </label>
-                                    <div id="profile-preview">
-                                        
+                                    <div id="adhar-back-preview">
+                                        <?php if(!empty($aadhar_back_image)){ ?>
+                                                <img
+                                                    src="<?php echo $define_company_website; ?>/uploads/staff/documents/<?php echo $aadhar_back_image; ?>"
+                                                    alt="Profile Picture"
+                                                    style="max-width:200px;
+                                                           border:1px solid #ddd;
+                                                           border-radius:8px;
+                                                           padding:5px;">
+                                            <?php } ?>
                                     </div>
                                 </div>
                             </div>
@@ -307,22 +380,22 @@ $employment_type_list = get_employment_type_list();
                                 </div>
 
                                 <div class="form-check form-switch form-check-custom form-check-solid">
-                                    <input class="form-check-input" type="checkbox" id="bondApplicable" name="bondApplicable">
+                                    <input class="form-check-input" type="checkbox" id="bondApplicable" name="bondApplicable" <?= ($is_bond_applicable == 1) ? 'checked' : ''; ?>>
                                 </div>
                             </div>
 
                             <!-- Hidden by default -->
-                            <div id="bondFields" style="display:none;">
+                            <div id="bondFields" style="display:<?php if($is_bond_applicable == 1) { echo 'block';} else { echo 'none';} ?>;">
                                 <div class="row col-2">
 
                                     <div class="field mb-4">
                                         <label>Bond Start Date <span class="req">*</span></label>
-                                        <input type="date" name="bond_start_date" id="bond_start_date" class="form-control form-control-lg form-control-solid">
+                                        <input type="date" name="bond_start_date" id="bond_start_date" class="form-control form-control-lg form-control-solid" value="<?php echo $contract_start; ?>">
                                     </div>
 
                                     <div class="field mb-4">
                                         <label>Bond End Date <span class="req">*</span></label>
-                                        <input type="date" name="bond_end_date" id="bond_end_date" class="form-control form-control-lg form-control-solid">
+                                        <input type="date" name="bond_end_date" id="bond_end_date" class="form-control form-control-lg form-control-solid" value="<?php echo $contract_end; ?>">
                                     </div>
                                 </div>
 
@@ -332,16 +405,16 @@ $employment_type_list = get_employment_type_list();
                                         <label>Bond Tenure</label>
                                         <select name="bond_tenure" id="bond_tenure" class="form-control form-control-lg form-control-solid">
                                             <option value="">Select</option>
-                                            <option value="6 Months">6 Months</option>
-                                            <option value="1 Year">1 Year</option>
-                                            <option value="2 Years">2 Years</option>
-                                            <option value="3 Years">3 Years</option>
+                                            <option value="6 Months" <?php if($bond_tenure == '6 Months'){ echo 'selected';} ?>>6 Months</option>
+                                            <option value="1 Year" <?php if($bond_tenure == '1 Year'){ echo 'selected';} ?>>1 Year</option>
+                                            <option value="2 Years" <?php if($bond_tenure == '2 Years'){ echo 'selected';} ?>>2 Years</option>
+                                            <option value="3 Years" <?php if($bond_tenure == '3 Years'){ echo 'selected';} ?>>3 Years</option>
                                         </select>
                                     </div>
 
                                     <div class="field mb-4">
                                         <label>Bond Amount (₹)</label>
-                                        <input type="number" name="bond_amount" id="bond_amount" placeholder="e.g. 50000" class="form-control form-control-lg form-control-solid">
+                                        <input type="number" name="bond_amount" id="bond_amount" placeholder="e.g. 50000" class="form-control form-control-lg form-control-solid" value="<?php echo $bond_amount; ?>">
                                     </div>
                                 </div>
 
@@ -353,8 +426,16 @@ $employment_type_list = get_employment_type_list();
                                             <div class="upload-icon">📷</div>
                                             <div class="upload-title">Upload Signed Bond</div>
                                         </label>
-                                        <div id="profile-preview">
-
+                                        <div id="bond-doc-preview">
+                                            <?php if(!empty($bond_doc)){ ?>
+                                                <img
+                                                    src="<?php echo $define_company_website; ?>/uploads/staff/documents/<?php echo $bond_doc; ?>"
+                                                    alt="Profile Picture"
+                                                    style="max-width:200px;
+                                                           border:1px solid #ddd;
+                                                           border-radius:8px;
+                                                           padding:5px;">
+                                            <?php } ?>
                                         </div>
                                     </div>
                                 </div>
@@ -382,7 +463,26 @@ $employment_type_list = get_employment_type_list();
                                 Work history helps assess experience and is referenced during appraisals.
                                 Visible to Admin and HR only.
                             </div>
-                            <div id="employerList"></div>
+                            <div id="employerList">
+                                <?php if($prevoius_work_history){
+                                            $work_history = json_decode($prevoius_work_history,true);
+                                            foreach($work_history as $single_history){?>
+                                                <div class="employer-card">
+                                                    <h5><?php echo $single_history['employer_name']; ?></h5>
+                                                    <div>
+                                                        Role: <?php echo $single_history['designation']; ?>
+                                                    </div>
+                                                    <div>
+                                                        Duration: <?php echo $single_history['duration']; ?>
+                                                    </div>
+                                                    <div>
+                                                        Left: <?php echo $single_history['reason']; ?>
+                                                    </div>
+                                                </div>
+                               <?php             
+                               }
+                                } ?>
+                            </div>
                             <button type="button" class="btn-add-employer" data-bs-toggle="modal" data-bs-target="#previousEmployerModal"> <i class="fas fa-plus"></i> Add previous employer</button>
                         </div>
                     </div>
@@ -402,46 +502,49 @@ $employment_type_list = get_employment_type_list();
                             <div class="field mb-4">
                                 <label>Increment basis <span class="text-danger">*</span></label>
                                 <div class="increment-tabs">
-                                    <button type="button" class="increment-btn active" data-type="periodic">
+                                    <button type="button" class="increment-btn <?= ($increment_basis == 'periodic') ? 'active' : '' ?>" data-type="periodic">
                                         Periodic — fixed time intervals
                                     </button>
 
-                                    <button type="button" class="increment-btn" data-type="performance">
+                                    <button type="button" class="increment-btn <?= ($increment_basis == 'performance') ? 'active' : '' ?>" data-type="performance">
                                         Performance-based
                                     </button>
                                 </div>
 
-                                <input type="hidden" name="increment_basis" id="increment_basis" value="periodic">
+                                <input type="hidden" name="increment_basis" id="increment_basis" value="<?= $increment_basis ?>">
                                 <input type="hidden" name="is_dept_head" id="is_dept_head" value="0">
                             </div>
 
                             <!-- Periodic Section -->
-                            <div id="periodicSection">
+                            <div id="periodicSection" style="display:<?= ($increment_basis == 'periodic') ? '' : 'none' ?>">
                                 <div class="row col-3">
                                     <div class="field mb-4">
                                         <label>First increment after *</label>
                                         <select name="first_increment_after" class="form-control form-control-lg form-control-solid">
-                                            <option value="3 Months">3 Months</option>
-                                            <option value="6 Months">6 Months</option>
-                                            <option value="12 Months">12 Months</option>
+                                            <option value="">Select</option>
+                                            <option value="3 Months" <?php if($first_increment_after == '3 Months') { echo 'selected';}  ?>>3 Months</option>
+                                            <option value="6 Months" <?php if($first_increment_after == '6 Months') { echo 'selected';}  ?>>6 Months</option>
+                                            <option value="12 Months" <?php if($first_increment_after == '12 Months') { echo 'selected';}  ?>>12 Months</option>
                                         </select>
                                     </div>
 
                                     <div class="field mb-4">
                                         <label>Then every *</label>
                                         <select name="increment_frequency" class="form-control form-control-lg form-control-solid">
-                                            <option value="6 Months">6 Months</option>
-                                            <option value="12 Months">12 Months</option>
-                                            <option value="24 Months">24 Months</option>
+                                            <option value="">Select</option>
+                                            <option value="6 Months" <?php if($increment_frequency == '6 Months') { echo 'selected';}?>>6 Months</option>
+                                            <option value="12 Months" <?php if($increment_frequency == '12 Months') { echo 'selected';}?>>12 Months</option>
+                                            <option value="24 Months" <?php if($increment_frequency == '24 Months') { echo 'selected';}?>>24 Months</option>
                                         </select>
                                     </div>
 
                                     <div class="field mb-4">
                                         <label>Remind Admin before (days)</label>
                                         <select name="periodic_reminder_days" class="form-control form-control-lg form-control-solid">
-                                            <option value="7">7 Days</option>
-                                            <option value="15">15 Days</option>
-                                            <option value="30">30 Days</option>
+                                            <option value="">Select</option>
+                                            <option value="7" <?php if($periodic_reminder_days == '7'){ echo 'selected';} ?>>7 Days</option>
+                                            <option value="15" <?php if($periodic_reminder_days == '15'){ echo 'selected';} ?>>15 Days</option>
+                                            <option value="30" <?php if($periodic_reminder_days == '30'){ echo 'selected';} ?>>30 Days</option>
                                         </select>
                                     </div>
 
@@ -450,24 +553,26 @@ $employment_type_list = get_employment_type_list();
                             </div>
 
                             <!-- Performance Section -->
-                            <div id="performanceSection" style="display:none;">
+                            <div id="performanceSection" style="display:<?= ($increment_basis == 'performance') ? '' : 'none' ?>">
                                 <div class="row col-2">
                                     <div class="field mb-4">
                                         <label>Review cycle</label>
                                         <select name="review_cycle" class="form-control form-control-lg form-control-solid">
-                                            <option value="Every 3 Months">Every 3 Months</option>
-                                            <option value="Every 6 Months">Every 6 Months</option>
-                                            <option value="Every 12 Months">Every 12 Months</option>
+                                            <option value="">Select</option>
+                                            <option value="Every 3 Months" <?php if($review_cycle == 'Every 3 Months'){echo 'selected';} ?>>Every 3 Months</option>
+                                            <option value="Every 6 Months" <?php if($review_cycle == 'Every 6 Months'){echo 'selected';} ?>>Every 6 Months</option>
+                                            <option value="Every 12 Months" <?php if($review_cycle == 'Every 12 Months'){echo 'selected';} ?>>Every 12 Months</option>
                                         </select>
                                     </div>
 
                                     <div class="field mb-4">
                                         <label>Minimum performance score</label>
                                         <select name="performance_score" class="form-control form-control-lg form-control-solid">
-                                            <option value="60%">60% and above</option>
-                                            <option value="70%">70% and above</option>
-                                            <option value="80%">80% and above</option>
-                                            <option value="90%">90% and above</option>
+                                            <option value="">Select</option>
+                                            <option value="60%" <?php if($performance_score == '60%'){echo 'selected';} ?>>60% and above</option>
+                                            <option value="70%" <?php if($performance_score == '70%'){echo 'selected';} ?>>70% and above</option>
+                                            <option value="80%" <?php if($performance_score == '80%'){echo 'selected';} ?>>80% and above</option>
+                                            <option value="90%" <?php if($performance_score == '90%'){echo 'selected';} ?>>90% and above</option>
                                         </select>
                                     </div>
                                 </div>
@@ -476,9 +581,10 @@ $employment_type_list = get_employment_type_list();
                                     <div class="field mb-4">
                                         <label>Remind Admin before review (days)</label>
                                         <select name="performance_reminder_days" class="form-control form-control-lg form-control-solid">
-                                            <option value="7">7 Days</option>
-                                            <option value="15" selected>15 Days</option>
-                                            <option value="30">30 Days</option>
+                                            <option value="">Select</option>
+                                            <option value="7" <?php if($performance_reminder_days == '7'){echo 'selected';} ?>>7 Days</option>
+                                            <option value="15" <?php if($performance_reminder_days == '15'){echo 'selected';} ?>>15 Days</option>
+                                            <option value="30" <?php if($performance_reminder_days == '30'){echo 'selected';} ?>>30 Days</option>
                                         </select>
                                     </div>
                                 </div>
@@ -494,7 +600,7 @@ $employment_type_list = get_employment_type_list();
                             <button type="button" class="btn" onclick="discardForm()">Discard</button>
                         </div>
                         <div class="action-bar-right">
-                            <button type="submit" class="btn btn-primary" id="kt_create_staff_details_submit">Save Changes</button>
+                            <button type="submit" class="btn btn-primary" id="kt_update_staff_details_submit">Update Changes</button>
                         </div>
                     </div>
                 </form>
@@ -624,7 +730,7 @@ $employment_type_list = get_employment_type_list();
 <script>var hostUrl = "<?php echo $site_path; ?>/";</script>
 <script src="<?php echo $site_path; ?>/assets/plugins/global/plugins.bundle.js"></script>
 <script src="<?php echo $site_path; ?>/assets/js/scripts.bundle.js"></script>
-<script src="<?php echo $site_path; ?>/assets/js/custom/create-staff.js?v=<?php echo time(); ?>"></script>
+<script src="<?php echo $site_path; ?>/assets/js/custom/update-staff.js?v=<?php echo time(); ?>"></script>
 <script>
     $(document).on('change', '#bondApplicable', function () {
         if ($(this).is(':checked')) {

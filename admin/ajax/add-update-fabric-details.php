@@ -20,7 +20,7 @@ function bindAndExecute(mysqli_stmt $stmt, array $params): bool {
     return $stmt->execute();
 }
 
-$id           = (int)($_POST['id'] ?? 0);
+$id           = (int)($_POST['hidden_id'] ?? 0);
 $fabric_name  = trim($_POST['fabric_name'] ?? '');
 $fabric_code  = trim($_POST['fabric_code'] ?? '');
 $fabric_type  = trim($_POST['fabric_type'] ?? '');
@@ -52,10 +52,6 @@ if ($fabric_type === '') {
     $errors[] = 'Fabric type is required.';
 }
 
-$allowed_types = ['Woven', 'Knitted', 'Denim', 'Satin', 'Velvet', 'Linen', 'Other'];
-if ($fabric_type !== '' && !in_array($fabric_type, $allowed_types, true)) {
-    $errors[] = 'Invalid fabric type.';
-}
 
 $allowed_units = ['Meter', 'Yard', 'Kg', 'Piece'];
 if (!in_array($unit, $allowed_units, true)) {

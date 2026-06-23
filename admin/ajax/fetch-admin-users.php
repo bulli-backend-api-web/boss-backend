@@ -5,7 +5,8 @@ $columns = [
     0 => "username",
     1 => "name",
     2 => "mobile",
-    3 => "typee"
+    3 => "typee",
+    4 => "created_date"
 ];
 
 // DataTables parameters
@@ -111,36 +112,14 @@ while ($r = $result->fetch_assoc()) {
         $user_image = '<img src="'.$image_path.'" alt="Avatar" class="w-100" />';
     }
     
-     $actions = '
-    <div class="d-flex gap-2">
-
-        <!-- VIEW BUTTON -->
-        <a href="'.$site_path.'/view-users?id='.my_simple_crypt($user_id,'encrypt_1').'" 
-           class="btn btn-light-primary btn-sm d-inline-flex align-items-center gap-2">
-
-            <i class="fa fa-eye">
-                <span class="path1"></span>
-                <span class="path2"></span>
-            </i>
-
-            <span>View</span>
-        </a>
-
-        <!-- DELETE BUTTON -->
-        <a href="javascript:void(0);" 
-           onclick="deleteUser('.$user_id.')" 
-           class="btn btn-light-danger btn-sm d-inline-flex align-items-center gap-2">
-
-            <i class="fa fa-trash">
-                <span class="path1"></span>
-                <span class="path2"></span>
-            </i>
-
-            <span>Delete</span>
-        </a>
-
-    </div>';
-
+    $actions ='<a href="#" class="btn btn-sm btn-light btn-flex btn-center btn-active-light-primary"  data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions <i class="ki-outline ki-down fs-5 ms-1"></i></a><div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600  menu-state-bg-light-primary fw-semibold fs-7 w-150px py-4" data-kt-menu="true">
+                 <div class="menu-item px-3">
+                    <a href="'.$site_path.'/view-users?id='.my_simple_crypt($user_id,'encrypt_1').'" class="menu-link px-3">View</a>
+                </div>
+                <div class="menu-item px-3">
+                    <a href="#" data-action="'.$site_path.'/ajax/ajax-delete-master-data" data-id="'.$user_id.'" class="menu-link px-3 delete_user">Delete</a>
+                </div>
+            </div>';
     $data[] = [
         "select_all" => '<div class="form-check form-check-sm form-check-custom form-check-solid">
                             <input class="form-check-input" type="checkbox" value="'.$r['id'].'" />

@@ -5,8 +5,8 @@ var KTcreateStaff = function () {
 
     return {
         init: function () {
-            form = document.getElementById("regForm");
-            submitButton = document.getElementById("kt_create_staff_details_submit");
+            form = document.getElementById("updateForm");
+            submitButton = document.getElementById("kt_update_staff_details_submit");
 
             validator = FormValidation.formValidation(form, {
                 fields: {
@@ -100,9 +100,9 @@ var KTcreateStaff = function () {
                 validator.validate().then(function (status) {
                     if (status === "Valid") {
                         submitButton.setAttribute("data-kt-indicator", "on");
-                        let formElement = document.getElementById("regForm");
+                        let formElement = document.getElementById("updateForm");
                         let formData = new FormData(formElement);
-                        formData.append('action', 'add-staff-details');
+                        formData.append('action', 'update-staff-details');
                         $.ajax({
                             url: form.getAttribute('action'),
                             type: "POST",
@@ -121,7 +121,7 @@ var KTcreateStaff = function () {
                                         customClass: { confirmButton: "btn btn-primary" }
                                     }).then(() => {
                                         form.reset();
-                                        window.location.reload();
+                                        window.location.href = response.redirect_url;
                                     });
                                 } else {
                                     Swal.fire({

@@ -62,7 +62,8 @@ if ($action == 'add_role') {
         echo json_encode([
             "status" => "success",
             "message" => "Role added successfully",
-            "slug" => $slug
+            "slug" => $slug,
+            "id" => $last_id
         ]);
     } else {
         echo json_encode(["status" => "error", "message" => "Database insert failed"]);

@@ -6,7 +6,7 @@ include("../config/database.php"); // DB connection
 include("../config/auth_check.php");
 
 error_reporting(E_ALL);
-ini_set('display_errors',1);
+ini_set('display_errors', 1);
 
 $action = $_POST['action'];
 if ($action == 'delete_inwards') {
@@ -108,26 +108,56 @@ if ($action == 'delete_inwards') {
         echo json_encode($response);
         exit;
     }
-}else if($action == 'delete_dept'){
-        $dept_id = $_POST['dept_id'];
-        $stmt = $con->prepare('DELETE from departments where id = ?');
-        $stmt->bind_param('i',$dept_id);
-        $stmt->execute();
-        $response['status'] = true;
-        $response['message'] = "Department deleted successfully";
+} else if ($action == 'delete_dept') {
+    $dept_id = $_POST['dept_id'];
+    $stmt = $con->prepare('DELETE from departments where id = ?');
+    $stmt->bind_param('i', $dept_id);
+    $stmt->execute();
+    $response['status'] = "success";
+    $response['message'] = "Department deleted successfully";
 
-        echo json_encode($response);
-        exit;
-}else if($action == 'delete_tag'){
-        $tag_id = $_POST['tag_id'];
-        $stmt = $con->prepare('DELETE from category where id = ?');
-        $stmt->bind_param('i',$tag_id);
-        $stmt->execute();
-        $response['status'] = true;
-        $response['message'] = "Tag deleted successfully";
+    echo json_encode($response);
+    exit;
+} else if ($action == 'delete_tag') {
+    $tag_id = $_POST['tag_id'];
+    $stmt = $con->prepare('DELETE from category where id = ?');
+    $stmt->bind_param('i', $tag_id);
+    $stmt->execute();
+    $response['status'] = "success";
+    $response['message'] = "Tag deleted successfully";
 
-        echo json_encode($response);
-        exit;
+    echo json_encode($response);
+    exit;
+} else if ($action == 'delete_fabric_type') {
+    $ftype_id = $_POST['ftype_id'];
+    $stmt = $con->prepare('DELETE from fabric_type where id = ?');
+    $stmt->bind_param('i', $ftype_id);
+    $stmt->execute();
+    $response['status'] = "success";
+    $response['message'] = "Fabric Type deleted successfully";
+
+    echo json_encode($response);
+    exit;
+} else if ($action == 'delete_user') {
+    $user_id = $_POST['user_id'];
+    $stmt = $con->prepare('DELETE from user where id = ?');
+    $stmt->bind_param('i', $user_id);
+    $stmt->execute();
+    $response['status'] = "success";
+    $response['message'] = "User deleted successfully";
+
+    echo json_encode($response);
+    exit;
+}else if($action == 'delete_jobwork'){
+    $job_id = $_POST['job_id'];
+    $stmt = $con->prepare('DELETE from jobwork_type where id = ?');
+    $stmt->bind_param('i', $job_id);
+    $stmt->execute();
+    $response['status'] = "success";
+    $response['message'] = "JObwork Type deleted successfully";
+
+    echo json_encode($response);
+    exit;
 } else {
     echo json_encode(["status" => "error", "message" => "Invalid request"]);
 }

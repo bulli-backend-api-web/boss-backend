@@ -3,6 +3,9 @@ include("../config/database.php");
 $action = isset($_POST['action']) ? $_POST['action'] : "";
 $role_id = isset($_POST['role_id']) ? $_POST['role_id'] : "";
 
+error_reporting(E_ALL);
+ini_set('display_errors',1);
+
 if ($action == 'update_role' && $role_id) {
     $user_role = isset($_POST['user_role']) ? implode(",",$_POST['user_role']) : "";
     $typee_id = isset($_POST['typee_id']) ? $_POST['typee_id'] : "";
@@ -123,12 +126,23 @@ if ($action == 'update_role' && $role_id) {
         echo json_encode(["status" => "success", "message" => "Plase select atleast one user for delete"]);
     }
 } else if ($action == 'add_new_user') {
+    $staff_id = $_POST['staff_id'];
+    $fullname = $user_email = $user_mobile = '';
+    if($staff_id){
+        $sql  = "SELECT fullname, email, mobile_number FROM staff_register WHERE id = ? LIMIT 1";
+        $stmt = $con->prepare($sql);
+        $stmt->bind_param("i", $staff_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($staff_row = $result->fetch_assoc()) {
+            $fullname = $staff_row['fullname'];
+            $user_email = $staff_row['email'];
+            $user_mobile = $staff_row['mobile_number'];
+        }
+    }
     $role_id = $_POST['role_id'];
     $user_name = $_POST['user_name'];
     $user_password = $_POST['user_password'];
-    $fullname = $_POST['fullname'];
-    $user_email = $_POST['user_email'];
-    $user_mobile = $_POST['user_mobile'];
     $department_id = $_POST['department_id'];
     $brand_name = isset($_POST['brand_name']) ? $_POST['brand_name'] : "";
     $face_attendance = $_POST['face_attendance'];
@@ -146,15 +160,15 @@ if ($action == 'update_role' && $role_id) {
     $status = 1;
     $scan_app_modules = isset($_POST['scan_app_moduel']) ? $_POST['scan_app_moduel'] : [];
     
-    $admin_sql = "SELECT id from role where slug = ?";
+    $admin_sql = "SELECT role_name from role where id = ?";
     $stmt = mysqli_prepare($con, $admin_sql);
-    mysqli_stmt_bind_param($stmt, "s", $user_role);
+    mysqli_stmt_bind_param($stmt, "s", $role_id);
     mysqli_stmt_execute($stmt);
     $adminResult = mysqli_stmt_get_result($stmt);
     $typee_id = 0;
     if ($adminResult) {
         $row = mysqli_fetch_assoc($adminResult);
-        $typee_id = $row['id'];
+        $user_role = $row['role_name'];
     }
     
     $brand_name = !empty($_POST['brand_name']) ? $_POST['brand_name'] : [];
@@ -168,9 +182,9 @@ if ($action == 'update_role' && $role_id) {
     if (mysqli_stmt_num_rows($stmt) > 0) {
         echo json_encode(["status" => "error", "message" => "Username / Email is already taken."]);
     } else {
-        $sql = "INSERT INTO user(typee,username ,password,name,mobile,email,profile_picture,status,typee_id,department_id,company_id,face_attendance) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+        $sql = "INSERT INTO user(staff_id,typee,username ,password,name,mobile,email,profile_picture,status,typee_id,department_id,company_id,face_attendance) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
         $stmt = mysqli_prepare($con, $sql);
-        mysqli_stmt_bind_param($stmt, "sssssssiissi", $user_role, $user_name, $user_password, $fullname, $user_mobile, $user_email, $profile_picture, $status, $typee_id,$department_id,$brand_name,$face_attendance);
+        mysqli_stmt_bind_param($stmt, "isssssssiissi", $staff_id,$user_role, $user_name, $user_password, $fullname, $user_mobile, $user_email, $profile_picture, $status, $role_id,$department_id,$brand_name,$face_attendance);
         if (mysqli_stmt_execute($stmt)) {
             $last_id = $con->insert_id;
             if (!empty($scan_app_modules)) {

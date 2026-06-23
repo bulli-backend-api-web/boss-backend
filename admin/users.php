@@ -5,6 +5,7 @@ include("includes/sidemenu.php");
 $users_role = getUniqueRoles();
 $all_department_list = getAllDepartments();
 $scan_app_modules = getScanAppModules();
+$all_register_staff_list = get_register_staff_list();
 
 error_reporting(E_ALL);
 ini_set('display_errors',1);
@@ -117,17 +118,17 @@ ini_set('display_errors',1);
                                             <form id="kt_modal_add_user_form" class="form" action="<?php echo $site_path; ?>/ajax/add-update-user-details">
                                                 <div class="d-flex flex-column scroll-y px-5 px-lg-10" id="kt_modal_add_user_scroll" data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_add_user_header" data-kt-scroll-wrappers="#kt_modal_add_user_scroll" data-kt-scroll-offset="300px">
                                                     <div class="fv-row mb-7">
-                                                        <label class="required fw-semibold fs-6 mb-2">Full Name</label>
-                                                        <input type="text" name="fullname" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Full name" value="" />
+                                                        <label class="required fw-semibold fs-6 mb-2">Select Staff</label>
+                                                        <select name="staff_id" id="staff_id" aria-label="Staff" data-control="select2" data-placeholder="Staff" class="form-select form-select-solid form-select-lg fw-semibold">
+                                                            <option value="">Select Department</option>
+                                                            <?php if($all_register_staff_list){
+                                                                    foreach($all_register_staff_list as $single_value){?>
+
+                                                            <option value="<?php echo $single_value['id']; ?>"><?php echo $single_value['fullname']; ?></option>
+                                                            <?php } } ?>
+                                                        </select>
                                                     </div>
-                                                    <div class="fv-row mb-7">
-                                                        <label class="required fw-semibold fs-6 mb-2">Email ID</label>
-                                                        <input type="email" name="user_email" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="example@domain.com" value="" />
-                                                    </div>
-                                                    <div class="fv-row mb-7">
-                                                        <label class="required fw-semibold fs-6 mb-2">Mobile</label>
-                                                        <input type="text" name="user_mobile" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Mobile Number" value="" />
-                                                    </div>
+                                                    
                                                     <div class="fv-row mb-7">
                                                         <label class="form-label required fw-semibold fs-6">Department</label>
                                                             <select name="department_id" id="department_id" aria-label="Department" data-control="select2" data-placeholder="Department" class="form-select form-select-solid form-select-lg fw-semibold">
@@ -364,6 +365,89 @@ ini_set('display_errors',1);
 
         $("#search_by_role").on('change', function () {
             table.ajax.reload();
+        });
+        
+        $(document).on('click', '.delete_user', function(e) {
+            e.preventDefault();
+
+            const btn = this;
+            const row = $(btn).closest("tr");
+            const user_id = $(btn).data("id");
+            const action = $(btn).data("action");
+            const userName = row.find("td").eq(1).text().trim() || "this user";
+
+            Swal.fire({
+                text: "Are you sure you want to delete " + userName + "?",
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "Yes, delete!",
+                cancelButtonText: "No, cancel",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-danger",
+                    cancelButton: "btn fw-bold btn-active-light-primary"
+                }
+            }).then(function(result) {
+                if (result.value) {
+                    $.ajax({
+                        url: action,
+                        type: "POST",
+                        data: {
+                            'user_id': user_id,
+                            'action': 'delete_user'
+                        },
+                        dataType: "json",
+                        success: function(res) {
+                            if (res.status === "success") {
+                                Swal.fire({
+                                    text: "You have deleted " + userName + "!",
+                                    icon: "success",
+                                    buttonsStyling: false,
+                                    confirmButtonText: "Ok, got it!",
+                                    customClass: {
+                                        confirmButton: "btn fw-bold btn-primary"
+                                    }
+                                }).then(function() {
+                                    $('#kt_tags_list').DataTable().row(row).remove().draw();
+                                    if (typeof a === 'function') a();
+                                     window.location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    text: res.message || "Could not delete " + userName,
+                                    icon: "error",
+                                    buttonsStyling: false,
+                                    confirmButtonText: "Ok, got it!",
+                                    customClass: {
+                                        confirmButton: "btn fw-bold btn-primary"
+                                    }
+                                });
+                            }
+                        },
+                        error: function() {
+                            Swal.fire({
+                                text: "Server error! " + userName + " was not deleted.",
+                                icon: "error",
+                                buttonsStyling: false,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn fw-bold btn-primary"
+                                }
+                            });
+                        }
+                    });
+                } else if (result.dismiss === "cancel") {
+                    Swal.fire({
+                        text: userName + " was not deleted.",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn fw-bold btn-primary"
+                        }
+                    });
+                }
+            });
         });
     });
 
