@@ -31,6 +31,7 @@ $slug = makeSlug($role_name);
 
 if ($action == 'add_role') {
     $permissions = $_POST['permissions'] ?? [];
+    $department_id = isset($_POST['department_id']) ? $_POST['department_id'] : "";
     $checkSql = "SELECT COUNT(*) as cnt FROM role WHERE role_name = ?";
     $stmt = mysqli_prepare($con, $checkSql);
     mysqli_stmt_bind_param($stmt, "s", $role_name);
@@ -42,9 +43,9 @@ if ($action == 'add_role') {
         echo json_encode(["status" => "error", "message" => "Role already exists in user table"]);
         exit;
     }
-    $sql = "INSERT INTO role (role_name, slug) VALUES (?, ?)";
+    $sql = "INSERT INTO role (role_name, slug,department_id) VALUES (?, ?,?)";
     $stmt = mysqli_prepare($con, $sql);
-    mysqli_stmt_bind_param($stmt, "ss", $role_name, $slug);
+    mysqli_stmt_bind_param($stmt, "ssi", $role_name, $slug,$department_id);
     $last_id = mysqli_insert_id($con);
     if (mysqli_stmt_execute($stmt)) {
         $deleteSql = "DELETE FROM role_modules WHERE role_id = ?";

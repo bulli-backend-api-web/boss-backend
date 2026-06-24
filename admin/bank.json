@@ -1,0 +1,134 @@
+[
+  {
+    "code": "SBI",
+    "name": "State Bank of India"
+  },
+  {
+    "code": "HDFC",
+    "name": "HDFC Bank"
+  },
+  {
+    "code": "ICICI",
+    "name": "ICICI Bank"
+  },
+  {
+    "code": "AXIS",
+    "name": "Axis Bank"
+  },
+  {
+    "code": "PNB",
+    "name": "Punjab National Bank"
+  },
+  {
+    "code": "BOB",
+    "name": "Bank of Baroda"
+  },
+  {
+    "code": "CANARA",
+    "name": "Canara Bank"
+  },
+  {
+    "code": "UNION",
+    "name": "Union Bank of India"
+  },
+  {
+    "code": "IOB",
+    "name": "Indian Overseas Bank"
+  },
+  {
+    "code": "INDIAN",
+    "name": "Indian Bank"
+  },
+  {
+    "code": "UCO",
+    "name": "UCO Bank"
+  },
+  {
+    "code": "CENTRAL",
+    "name": "Central Bank of India"
+  },
+  {
+    "code": "BANKINDIA",
+    "name": "Bank of India"
+  },
+  {
+    "code": "MAHARASHTRA",
+    "name": "Bank of Maharashtra"
+  },
+  {
+    "code": "IDBI",
+    "name": "IDBI Bank"
+  },
+  {
+    "code": "YES",
+    "name": "Yes Bank"
+  },
+  {
+    "code": "KOTAK",
+    "name": "Kotak Mahindra Bank"
+  },
+  {
+    "code": "INDUSIND",
+    "name": "IndusInd Bank"
+  },
+  {
+    "code": "FEDERAL",
+    "name": "Federal Bank"
+  },
+  {
+    "code": "RBL",
+    "name": "RBL Bank"
+  },
+  {
+    "code": "BANDHAN",
+    "name": "Bandhan Bank"
+  },
+  {
+    "code": "AU",
+    "name": "AU Small Finance Bank"
+  },
+  {
+    "code": "EQUITAS",
+    "name": "Equitas Small Finance Bank"
+  },
+  {
+    "code": "UJJIVAN",
+    "name": "Ujjivan Small Finance Bank"
+  },
+  {
+    "code": "SURYODAY",
+    "name": "Suryoday Small Finance Bank"
+  },
+  {
+    "code": "ESAF",
+    "name": "ESAF Small Finance Bank"
+  },
+  {
+    "code": "DCB",
+    "name": "DCB Bank"
+  },
+  {
+    "code": "CSB",
+    "name": "CSB Bank"
+  },
+  {
+    "code": "KARNATAKA",
+    "name": "Karnataka Bank"
+  },
+  {
+    "code": "KARUR",
+    "name": "Karur Vysya Bank"
+  },
+  {
+    "code": "TMB",
+    "name": "Tamilnad Mercantile Bank"
+  },
+  {
+    "code": "SOUTHINDIAN",
+    "name": "South Indian Bank"
+  },
+  {
+    "code": "CITYUNION",
+    "name": "City Union Bank"
+  }
+]

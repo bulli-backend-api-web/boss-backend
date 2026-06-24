@@ -2,7 +2,7 @@
 include("../config/database.php");
 $employ_id = generate_staff_code();
 
-$action = isset($_POST['action']) ? $_POST['action'] : "";
+$action = isset($_POST['action']) ? $_POST['action'] : "add-staff-details";
 if ($action == 'add-staff-details') {
     $firstName = trim($_POST['firstName'] ?? '');
     $middleName = trim($_POST['middleName'] ?? '');

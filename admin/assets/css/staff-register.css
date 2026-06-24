@@ -320,7 +320,7 @@
     max-width: none !important;
     flex: none !important;
     gap: 11px;
-    margin-bottom: 10px;
+    margin-bottom: 0px;
     margin-left: 0 !important;
     margin-right: 0 !important;
     --bs-gutter-x: 0;
@@ -497,7 +497,7 @@ select   {
     flex: none !important;
     align-items: start;
     gap: 11px;
-    margin-bottom: 10px;
+    margin-bottom: 0px;
     --bs-gutter-x: 0;
     --bs-gutter-y: 0;
 }
@@ -1002,4 +1002,98 @@ select   {
 
 .quick-add-link:hover{
     color:#5e3a1b;
+}
+.registration-stepper{
+    display:flex;
+    border:1px solid #e2e2e2;
+    border-radius:15px;
+    overflow:hidden;
+    margin-bottom:25px;
+    background:#fff;
+}
+
+.registration-stepper .step{
+    flex:1;
+    text-align:center;
+    padding:15px 10px;
+    border-right:1px solid #e8e8e8;
+    cursor:pointer;
+    position:relative;
+    background:#fff;
+}
+
+.registration-stepper .step:last-child{
+    border-right:none;
+}
+
+.registration-stepper .step-no{
+    display:block;
+    color:#b9933f;
+    font-size:14px;
+    font-weight:700;
+}
+
+.registration-stepper .step-title{
+    display:block;
+    font-size:15px;
+    color:#444;
+}
+
+.registration-stepper .step.active{
+    background:#faf8f3;
+}
+
+.registration-stepper .step.active::after{
+    content:'';
+    position:absolute;
+    left:0;
+    bottom:0;
+    width:100%;
+    height:3px;
+    background:#c89d3f;
+}
+
+.form-step{
+    display:none;
+}
+
+.form-step.active{
+    display:block;
+}
+
+.wizard-footer{
+    display:flex;
+    justify-content:flex-end;
+    margin-top:25px;
+}
+
+.wizard-footer .btn{
+    min-width:180px;
+}
+.review-summary{
+    max-width:100%;
+}
+
+.registration-summary-card{
+    background:#fff;
+}
+
+.summary-header{
+    font-size:18px;
+    font-weight:600;
+    padding-bottom:15px;
+    margin-bottom:20px;
+    border-bottom:1px solid #eee;
+}
+
+.summary-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:14px 0;
+    border-bottom:1px solid #f1f1f1;
+}
+
+.summary-row:last-child{
+    border-bottom:none;
 }

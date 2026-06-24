@@ -1435,6 +1435,15 @@ function generate_staff_code(){
     return 'BK-STF-'.$date."-". str_pad($count + 1, 3, '0', STR_PAD_LEFT);
 }
 
+function generate_karigar_code(){
+    global $con;
+    $date = date('Y');
+    $result = mysqli_query($con, "SELECT COUNT(*) AS total FROM karigar_registration");
+    $row    = mysqli_fetch_assoc($result);
+    $count  = (int) $row['total'];
+    return 'BK-KRG-'.$date."-". str_pad($count + 1, 3, '0', STR_PAD_LEFT);
+}
+
 function get_fabric_type_list(){
     global $con;
     $fabric_type_list = [];
