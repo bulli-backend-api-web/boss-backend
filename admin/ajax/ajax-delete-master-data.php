@@ -1,7 +1,4 @@
 <?php
-
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 include("../config/database.php"); // DB connection
 include("../config/auth_check.php");
 
@@ -155,6 +152,16 @@ if ($action == 'delete_inwards') {
     $stmt->execute();
     $response['status'] = "success";
     $response['message'] = "JObwork Type deleted successfully";
+
+    echo json_encode($response);
+    exit;
+}else if($action == 'delete_staff'){
+    $staff_id = $_POST['staff_id'];
+    $stmt = $con->prepare('DELETE from staff_register where id = ?');
+    $stmt->bind_param('i', $staff_id);
+    $stmt->execute();
+    $response['status'] = "success";
+    $response['message'] = "Staff deleted successfully";
 
     echo json_encode($response);
     exit;

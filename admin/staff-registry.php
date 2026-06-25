@@ -33,7 +33,7 @@ include("includes/sidemenu.php");
                                     <span class="path1"></span>
                                     <span class="path2"></span>
                                 </i>
-                                <input type="text" id="model_search" class="form-control form-control-solid w-300px ps-12" placeholder="Search" />
+                                <input type="text" id="staff_search" class="form-control form-control-solid w-300px ps-12" placeholder="Search" />
                             </div>
                         </div>
                         <a href="<?php echo $site_path; ?>/create-staff" class="btn btn-primary"><i class="fa fa-plus"></i>Register New Staff</a>
@@ -66,68 +66,134 @@ include("includes/sidemenu.php");
 <script src="<?php echo $site_path; ?>/assets/plugins/global/plugins.bundle.js"></script>
 <script src="<?php echo $site_path; ?>/assets/js/scripts.bundle.js"></script>
 <script src="<?php echo $site_path; ?>/assets/plugins/custom/datatables/datatables.bundle.js"></script>
-<script src="<?php echo $site_path; ?>/assets/js/custom/apps/user-management/users/list/table.js?v=<?php echo time(); ?>"></script>
 
 <script>
     $(document).ready(function () {
         var table = $('#kt_staff_table').DataTable({
-        processing: true,
-        serverSide: true,
-        pageLength: 10,
-        lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
-        ajax: {
-            url: "<?php echo $site_path; ?>/ajax/fetch-staff-list",
-            type: "POST",
-            data: function (d) {
-                
+            processing: true,
+            serverSide: true,
+            pageLength: 10,
+            lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+            ajax: {
+                url: "<?php echo $site_path; ?>/ajax/fetch-staff-list",
+                type: "POST",
+                data: function (d) {
+                    d.status = $("#status_filter").val()
+                }
+            },
+            columns: [
+                {data: 'sr_no' },
+                {data: 'name', orderable: false },
+                {data: 'mobile_number', orderable: false },
+                {data: 'email' },
+                {data: 'gender'},
+                {data: 'dob'},
+                {data: 'doj'},
+                {data: 'actions'}
+            ],
+            order: [[0, 'desc']],
+            drawCallback: function () {
+                if (typeof KTMenu !== 'undefined') {
+                    KTMenu.createInstances();
+                }
             }
-        },
-        columns: [
-            {data: 'sr_no' },
-            {data: 'name', orderable: false },
-            {data: 'mobile_number', orderable: false },
-            {data: 'email' },
-            {data: 'gender'},
-            {data: 'dob'},
-            {data: 'doj'},
-            {data: 'actions'}
-        ],
-        order: [[0, 'desc']],
-        drawCallback: function () {
-            if (typeof KTMenu !== 'undefined') {
-                KTMenu.createInstances();
-                lazyLoadImages();
-            }
-        }
     });
     
         
 
-        $('#sample_search').on('keyup', function () {
-            table.search(this.value).draw();
-        });
+    $('#staff_search').on('keyup', function () {
+        table.search(this.value).draw();
+    });
 
-        $('#budget_filter').on('change', function () {
-            table.ajax.reload();
-        });
-        
-        $('#category_filter').on('change', function () {
-            table.ajax.reload();
-        });
+    $('#budget_filter').on('change', function () {
+        table.ajax.reload();
+    });
+
+    $('#category_filter').on('change', function () {
+        table.ajax.reload();
+    });
     
-        function lazyLoadImages(){
-            const observer = new IntersectionObserver(function(entries){
-                entries.forEach(function(entry){
-                    if(entry.isIntersecting){
-                        let img = entry.target;
-                        img.src = img.dataset.src;
-                        observer.unobserve(img);
-                    }
-                });
+    $(document).on('click', '.delete_staff', function(e) {
+            e.preventDefault();
+
+            const btn = this;
+            const row = $(btn).closest("tr");
+            const staff_id = $(btn).data("id");
+            const action = $(btn).data("action");
+            const userName = row.find("td").eq(1).text().trim() || "this user";
+
+            Swal.fire({
+                text: "Are you sure you want to delete " + userName + "?",
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "Yes, delete!",
+                cancelButtonText: "No, cancel",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-danger",
+                    cancelButton: "btn fw-bold btn-active-light-primary"
+                }
+            }).then(function(result) {
+                if (result.value) {
+                    $.ajax({
+                        url: action,
+                        type: "POST",
+                        data: {
+                            'staff_id': staff_id,
+                            'action': 'delete_staff'
+                        },
+                        dataType: "json",
+                        success: function(res) {
+                            if (res.status === "success") {
+                                Swal.fire({
+                                    text: "You have deleted " + userName + "!",
+                                    icon: "success",
+                                    buttonsStyling: false,
+                                    confirmButtonText: "Ok, got it!",
+                                    customClass: {
+                                        confirmButton: "btn fw-bold btn-primary"
+                                    }
+                                }).then(function() {
+                                    $('#kt_table_users').DataTable().row(row).remove().draw();
+                                    if (typeof a === 'function') a();
+                                     window.location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    text: res.message || "Could not delete " + userName,
+                                    icon: "error",
+                                    buttonsStyling: false,
+                                    confirmButtonText: "Ok, got it!",
+                                    customClass: {
+                                        confirmButton: "btn fw-bold btn-primary"
+                                    }
+                                });
+                            }
+                        },
+                        error: function() {
+                            Swal.fire({
+                                text: "Server error! " + userName + " was not deleted.",
+                                icon: "error",
+                                buttonsStyling: false,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn fw-bold btn-primary"
+                                }
+                            });
+                        }
+                    });
+                } else if (result.dismiss === "cancel") {
+                    Swal.fire({
+                        text: userName + " was not deleted.",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn fw-bold btn-primary"
+                        }
+                    });
+                }
             });
-            document.querySelectorAll('.lazy-img').forEach(function(img){
-                observer.observe(img);
-            });
-        }
-      });
+        });
+});
 </script>

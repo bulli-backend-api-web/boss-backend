@@ -1,183 +1,161 @@
 "use strict";
 
-// Class definition
-var KTUsersUpdatePermissions = function () {
-    // Shared variables
-    const element = document.getElementById('kt_modal_update_role');
-    const form = element.querySelector('#kt_modal_update_role_form');
-    const modal = new bootstrap.Modal(element);
+var KTUsersAddRole = function () {
+    const t = document.getElementById("kt_modal_update_role"),
+        e = t.querySelector("#kt_modal_update_role_form"),
+        n = new bootstrap.Modal(t);
 
-    // Init add schedule modal
-    var initUpdatePermissions = () => {
-
-        // Init form validation rules. For more info check the FormValidation plugin's official documentation:https://formvalidation.io/
-        var validator = FormValidation.formValidation(
-            form,
-            {
-                fields: {
-                    'role_name': {
-                        validators: {
-                            notEmpty: {
-                                message: 'Role name is required'
+    return {
+        init: function () {
+            (() => {
+                var o = FormValidation.formValidation(e, {
+                    fields: {
+                        role_name: {
+                            validators: {
+                                notEmpty: {
+                                    message: "Role name is required"
+                                }
                             }
                         }
                     },
-                },
-
-                plugins: {
-                    trigger: new FormValidation.plugins.Trigger(),
-                    bootstrap: new FormValidation.plugins.Bootstrap5({
-                        rowSelector: '.fv-row',
-                        eleInvalidClass: '',
-                        eleValidClass: ''
-                    })
-                }
-            }
-        );
-
-        // Close button handler
-        const closeButton = element.querySelector('[data-kt-roles-modal-action="close"]');
-        closeButton.addEventListener('click', e => {
-            e.preventDefault();
-
-            Swal.fire({
-                text: "Are you sure you would like to close?",
-                icon: "warning",
-                showCancelButton: true,
-                buttonsStyling: false,
-                confirmButtonText: "Yes, close it!",
-                cancelButtonText: "No, return",
-                customClass: {
-                    confirmButton: "btn btn-primary",
-                    cancelButton: "btn btn-active-light"
-                }
-            }).then(function (result) {
-                if (result.value) {
-                    modal.hide(); // Hide modal				
-                }
-            });
-        });
-
-        // Cancel button handler
-        const cancelButton = element.querySelector('[data-kt-roles-modal-action="cancel"]');
-        cancelButton.addEventListener('click', e => {
-            e.preventDefault();
-
-            Swal.fire({
-                text: "Are you sure you would like to cancel?",
-                icon: "warning",
-                showCancelButton: true,
-                buttonsStyling: false,
-                confirmButtonText: "Yes, cancel it!",
-                cancelButtonText: "No, return",
-                customClass: {
-                    confirmButton: "btn btn-primary",
-                    cancelButton: "btn btn-active-light"
-                }
-            }).then(function (result) {
-                if (result.value) {
-                    form.reset(); // Reset form	
-                    modal.hide(); // Hide modal				
-                } else if (result.dismiss === 'cancel') {
-                    Swal.fire({
-                        text: "Your form has not been cancelled!.",
-                        icon: "error",
-                        buttonsStyling: false,
-                        confirmButtonText: "Ok, got it!",
-                        customClass: {
-                            confirmButton: "btn btn-primary",
-                        }
-                    });
-                }
-            });
-        });
-
-        // Submit button handler
-        const submitButton = element.querySelector('[data-kt-roles-modal-action="submit"]');
-        submitButton.addEventListener('click', function (e) {
-            // Prevent default button action
-            e.preventDefault();
-
-            // Validate form before submit
-            if (validator) {
-                validator.validate().then(function (status) {
-                    console.log('validated!');
-
-                    if (status == 'Valid') {
-                        // Show loading indication
-                        submitButton.setAttribute('data-kt-indicator', 'on');
-
-                        // Disable button to avoid multiple click 
-                        submitButton.disabled = true;
-
-                        // Simulate form submission. For more info check the plugin's official documentation: https://sweetalert2.github.io/
-                        setTimeout(function () {
-                            // Remove loading indication
-                            submitButton.removeAttribute('data-kt-indicator');
-
-                            // Enable button
-                            submitButton.disabled = false;
-
-                            // Show popup confirmation 
-                            Swal.fire({
-                                text: "Form has been successfully submitted!",
-                                icon: "success",
-                                buttonsStyling: false,
-                                confirmButtonText: "Ok, got it!",
-                                customClass: {
-                                    confirmButton: "btn btn-primary"
-                                }
-                            }).then(function (result) {
-                                if (result.isConfirmed) {
-                                    modal.hide();
-                                }
-                            });
-
-                            //form.submit(); // Submit form
-                        }, 2000);
-                    } else {
-                        // Show popup warning. For more info check the plugin's official documentation: https://sweetalert2.github.io/
-                        Swal.fire({
-                            text: "Sorry, looks like there are some errors detected, please try again.",
-                            icon: "error",
-                            buttonsStyling: false,
-                            confirmButtonText: "Ok, got it!",
-                            customClass: {
-                                confirmButton: "btn btn-primary"
-                            }
-                        });
+                    plugins: {
+                        trigger: new FormValidation.plugins.Trigger(),
+                        bootstrap: new FormValidation.plugins.Bootstrap5({
+                            rowSelector: ".fv-row",
+                            eleInvalidClass: "",
+                            eleValidClass: ""
+                        })
                     }
                 });
-            }
-        });
-    }
 
-    // Select all handler
-    const handleSelectAll = () => {
-        // Define variables
-        const selectAll = form.querySelector('#kt_roles_select_all');
-        const allCheckboxes = form.querySelectorAll('[type="checkbox"]');
+                // 🔹 Submit button
+                const r = t.querySelector('[data-kt-roles-modal-action="submit"]');
+                r.addEventListener("click", function (ev) {
+                    ev.preventDefault();
+                    o && o.validate().then(function (status) {
+                        if (status === "Valid") {
+                            r.setAttribute("data-kt-indicator", "on");
+                            r.disabled = true;
 
-        // Handle check state
-        selectAll.addEventListener('change', e => {
+                            var formData = new FormData(e);
+                            formData.append("action", "update_role");
 
-            // Apply check state to all checkboxes
-            allCheckboxes.forEach(c => {
-                c.checked = e.target.checked;
-            });
-        });
-    }
+                            fetch(e.getAttribute('action'), {
+                                method: "POST",
+                                body: formData
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.status === "success") {
+                                        Swal.fire({
+                                            text: data.message,
+                                            icon: "success",
+                                            buttonsStyling: false,
+                                            confirmButtonText: "Ok, got it!",
+                                            customClass: { confirmButton: "btn btn-primary" }
+                                        }).then(() => {
+                                            n.hide();   // close modal
+                                            e.reset();  // reset form
+                                            location.reload();
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            text: data.message,
+                                            icon: "error",
+                                            buttonsStyling: false,
+                                            confirmButtonText: "Ok, got it!",
+                                            customClass: { confirmButton: "btn btn-primary" }
+                                        });
+                                    }
+                                })
+                                .catch(err => {
+                                    console.error("AJAX Error:", err);
+                                    Swal.fire({
+                                        text: "Something went wrong. Please try again.",
+                                        icon: "error",
+                                        buttonsStyling: false,
+                                        confirmButtonText: "Ok, got it!",
+                                        customClass: { confirmButton: "btn btn-primary" }
+                                    });
+                                })
+                                .finally(() => {
+                                    r.removeAttribute("data-kt-indicator");
+                                    r.disabled = false;
+                                });
 
-    return {
-        // Public functions
-        init: function () {
-            initUpdatePermissions();
-            handleSelectAll();
+                        } else {
+                            Swal.fire({
+                                text: "Sorry, looks like there are some errors detected, please try again.",
+                                icon: "error",
+                                buttonsStyling: false,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: { confirmButton: "btn btn-primary" }
+                            });
+                        }
+                    });
+                });
+
+                // 🔹 Close (X button)
+                t.querySelector('[data-kt-roles-modal-action="close"]').addEventListener("click", ev => {
+                    ev.preventDefault();
+                    Swal.fire({
+                        text: "Are you sure you would like to close?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        buttonsStyling: false,
+                        confirmButtonText: "Yes, close it!",
+                        cancelButtonText: "No, return",
+                        customClass: {
+                            confirmButton: "btn btn-primary",
+                            cancelButton: "btn btn-active-light"
+                        }
+                    }).then(result => {
+                        if (result.isConfirmed) {
+                            e.reset();
+                            n.hide();
+                        }
+                    });
+                });
+
+                // 🔹 Cancel (Discard) button
+                t.querySelector('[data-kt-roles-modal-action="cancel"]').addEventListener("click", ev => {
+                    ev.preventDefault();
+                    Swal.fire({
+                        text: "Are you sure you would like to discard changes?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        buttonsStyling: false,
+                        confirmButtonText: "Yes, discard it!",
+                        cancelButtonText: "No, return",
+                        customClass: {
+                            confirmButton: "btn btn-primary",
+                            cancelButton: "btn btn-active-light"
+                        }
+                    }).then(result => {
+                        if (result.isConfirmed) {
+                            e.reset();
+                            n.hide();
+                        }
+                    });
+                });
+            })();
+
+            // 🔹 Select all checkbox logic
+            (() => {
+                const t = e.querySelector("#kt_roles_select_all"),
+                    n = e.querySelectorAll('[type="checkbox"]');
+                if (t) {
+                    t.addEventListener("change", ev => {
+                        n.forEach(chk => {
+                            chk.checked = ev.target.checked;
+                        });
+                    });
+                }
+            })();
         }
-    };
+    }
 }();
 
-// On document ready
 KTUtil.onDOMContentLoaded(function () {
-    KTUsersUpdatePermissions.init();
+    KTUsersAddRole.init();
 });

@@ -19,12 +19,12 @@ $columns = [
     2 => 'mobile_number'
 ];
 
-$orderColumn = $columns[$orderColumnIndex] ?? 'd.id';
+$orderColumn = $columns[$orderColumnIndex] ?? 'id';
 $where = " WHERE 1=1 ";
 $params = [];
 
 if (!empty($search)) {
-    $where .= " AND fullname LIKE '%$search%' OR mobile_number LIKE '%$search%' OR email LIKE '%$search%'";
+    $where .= " AND firstname LIKE '%$search%' OR mobile_number LIKE '%$search%' OR email LIKE '%$search%'";
 }
 
 $stmtTotal = $con->prepare("SELECT COUNT(*) as total FROM staff_register");
@@ -66,6 +66,9 @@ foreach ($rows as $row) {
                 </div>
                 <div class="menu-item px-3">
                     <a href="'.$site_path.'/view-staff?id='.my_simple_crypt($row['id'],'encrypt_1').'" class="menu-link px-3">View</a>
+                </div>
+                <div class="menu-item px-3">
+                    <a href="#" data-action="'.$site_path.'/ajax/ajax-delete-master-data" data-id="'.$row['id'].'" class="menu-link px-3 delete_staff" >Delete</a>
                 </div>
             </div>';
     $id = $row['id'];

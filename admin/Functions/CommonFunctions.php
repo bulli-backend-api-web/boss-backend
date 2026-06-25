@@ -801,7 +801,7 @@ function allScanAPPAssignModule($user_id){
 function getAllStaffList(){
     global $con;
     $user_list = [];
-    $user_sql = "SELECT id,name from user where status = 1";
+    $user_sql = "SELECT id,name,status from user where status = 1";
     if ($stmt = mysqli_prepare($con, $user_sql)) {
         mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
