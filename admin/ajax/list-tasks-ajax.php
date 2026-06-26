@@ -17,8 +17,13 @@ $frequency = !empty($_POST['frequency']) ? $_POST['frequency'] : "";
 $quick = !empty($_POST['quick']) ? $_POST['quick'] : "";
 $columns = [
     0 => 'tm.id',
-    1 => 'tm.task_no',
-    2 => 'tm.title'
+    1 => 'tm.title',
+    2 => 'tm.task_type',
+    3 => 'tm.priority',
+    4 => 'tm.department_id',
+    5 => 'tm.assigned_to',
+    6 => 'tm.deadline_time',
+    7 => 'tm.status'
 ];
 
 $orderColumn = $columns[$orderColumnIndex] ?? 'tm.id';
@@ -48,7 +53,7 @@ if($quick && $quick!='all'){
 $params = [];
 
 if (!empty($search)) {
-    $where .= " AND fullname title '%$search%' OR task_no LIKE '%$search%' OR description LIKE '%$search%'";
+    $where .= " AND tm.title LIKE '%$search%' OR tm.task_no LIKE '%$search%' OR tm.description LIKE '%$search%' OR tm.priority LIKE '%$search%' OR tm.task_type LIKE '%$search%'";
 }
 
 $stmtTotal = $con->prepare("SELECT COUNT(*) as total FROM task_master tm");
@@ -58,8 +63,10 @@ $result = $stmtTotal->get_result();
 $row = $result->fetch_assoc();
 
 $totalRecords = $row['total'];
-
+///echo "SELECT COUNT(*) as total FROM task_master tm $where";die;
 $stmtFiltered = $con->prepare("SELECT COUNT(*) as total FROM task_master tm $where");
+
+
 
 if (!empty($params)) {
     $types = '';
@@ -107,7 +114,11 @@ foreach ($rows as $row) {
     $status_badge = '';
     switch(strtolower($row['status'])) {
         case 'pending':
-            $status_badge = '<span class="badge badge-light-danger">Pending</span>';
+            $status_badge = '<span class="badge badge-light-warning">Pending</span>';
+            break;
+        
+        case 'active':
+            $status_badge = '<span class="badge badge-light-warning">Pending</span>';
             break;
 
         case 'in progress':
@@ -120,6 +131,10 @@ foreach ($rows as $row) {
 
         case 'completed':
             $status_badge = '<span class="badge badge-light-success">Done</span>';
+            break;
+        
+        case 'resubmission':
+            $status_badge = '<span class="badge badge-light-danger">Resubmission</span>';
             break;
     }
 

@@ -4,13 +4,18 @@ include("config/auth_check.php");
 include("includes/sidemenu.php");
 
 error_reporting(E_ALL);
-ini_set('display_errors',1);
+ini_set('display_errors',0);
+
+$current_date = date('Y-m-d');
 
 $todays_start_date = date('Y-m-d'). " 00:00:00";
 $todays_end_date = date('Y-m-d'). " 23:59:59";
 
 $department_list = getAllDepartments();
 $design_categories = get_all_tag_list();
+$staff_list = getAllStaffList();
+$fabric_list = get_fabric_type_list();
+$jobwork_type_list = get_jobwork_type_list();
 
 /* ---------- Total tasks this month ---------- */
 $month_start = date('Y-m-01 00:00:00');
@@ -349,7 +354,7 @@ if (!function_exists('formatOverdue')) {
                                 <div class="idle-staff-name"><?= htmlspecialchars($is['name']) ?></div>
                                 <div class="idle-staff-role text-muted"><?= htmlspecialchars($is['typee'] ?? '') ?> &middot; <?= htmlspecialchars($is['department_name'] ?? 'Unassigned') ?></div>
                                 <div class="idle-staff-time text-muted"><i class="ki-duotone ki-time fs-7"></i> All day today</div>
-                                <button class="btn-quick-assign" onclick="quickAssign(<?= $is['id'] ?>)">&#9889; Quick assign task</button>
+                                <button class="btn-quick-assign" <button class="btn-quick-assign" onclick="quickAssign(<?= $is['id'] ?>, '<?= htmlspecialchars($is['name']) ?>', <?= $is['active_tasks'] ?? 0 ?>)">⚡ Quick assign task</button>
                             </div>
                         <?php endforeach; else: ?>
                             <div class="text-center text-muted py-4">No idle staff right now &mdash; everyone has active tasks.</div>
@@ -374,7 +379,7 @@ if (!function_exists('formatOverdue')) {
                                 <div class="idle-dept-name"><?= htmlspecialchars($drow['department_name']) ?></div>
                                 <div class="idle-dept-staff text-muted"><?= (int)$drow['staff_count'] ?> staff idle</div>
                                 <div class="idle-dept-note text-success">No tasks assigned today</div>
-                                <button class="btn-create-dept-task" onclick="createDeptTask(<?= $drow['id'] ?>)">+ Create dept task</button>
+                                <button class="btn-create-dept-task" data-bs-toggle="modal" data-bs-target="#createTaskModal">+ Create dept task</button>
                             </div>
                         <?php
                             endwhile;
@@ -415,8 +420,8 @@ if (!function_exists('formatOverdue')) {
                         $statuses = [
                             'todo'        => ['label' => 'To Do',            'class' => 'col-todo'],
                             'in_progress' => ['label' => 'In Progress',      'class' => 'col-progress'],
-                            'pending'     => ['label' => 'Pending confirm',  'class' => 'col-pending'],
-                            'done'        => ['label' => 'Done',             'class' => 'col-done'],
+                            'Pending'     => ['label' => 'Pending confirm',  'class' => 'col-pending'],
+                            'Completed'        => ['label' => 'Done',             'class' => 'col-done'],
                         ];
                         foreach ($statuses as $status_key => $meta) {
                             $kt_sql = "SELECT t.id, t.title, t.task_type, t.priority, t.deadline_time, t.assigned_to, t.department_id
@@ -465,26 +470,38 @@ if (!function_exists('formatOverdue')) {
                         <button class="pill" data-filter="week">This week</button>
                         <button class="pill" data-filter="high">High priority</button>
                     </div>
-                    <div class="list-filter-dropdowns">
-                        <select class="form-select form-select-sm w-auto" id="list_dept_filter">
-                            <option value="">All departments</option>
-                            <?php
-                            $ld_res = $con->query("SELECT id, department_name FROM departments ORDER BY department_name");
-                            if ($ld_res) { while ($ld = $ld_res->fetch_assoc()) {
-                                echo '<option value="'.(int)$ld['id'].'">'.htmlspecialchars($ld['department_name']).'</option>';
-                            } }
-                            ?>
-                        </select>
-                        <select class="form-select form-select-sm w-auto" id="list_freq_filter">
-                            <option value="">All frequencies</option>
-                            <option value="daily">Daily</option>
-                            <option value="weekly">Weekly</option>
-                            <option value="monthly">Monthly</option>
-                            <option value="specific">Specific</option>
-                            <option value="onetime">Onetime</option>
-                            <option value="recurring">Recurring</option>
-                        </select>
-                        <button class="btn btn-light-secondary btn-sm" id="clear_list_filters">&times; Clear filters</button>
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-2">
+                        <!-- LEFT: dropdowns -->
+                        <div class="list-filter-dropdowns d-flex gap-2 align-items-center">
+                            <select class="form-select form-select-sm w-auto" id="list_dept_filter">
+                                <option value="">All departments</option>
+                                <?php
+                                $ld_res = $con->query("SELECT id, department_name FROM departments ORDER BY department_name");
+                                if ($ld_res) {
+                                    while ($ld = $ld_res->fetch_assoc()) {
+                                        echo '<option value="'.(int)$ld['id'].'">'.htmlspecialchars($ld['department_name']).'</option>';
+                                    }
+                                }
+                                ?>
+                            </select>
+
+                            <select class="form-select form-select-sm w-auto" id="list_freq_filter">
+                                <option value="">All frequencies</option>
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly">Monthly</option>
+                                <option value="specific">Specific</option>
+                                <option value="onetime">Onetime</option>
+                                <option value="recurring">Recurring</option>
+                            </select>
+
+                            <button class="btn btn-light-secondary btn-sm" id="clear_list_filters">
+                                × Clear filters
+                            </button>
+                        </div>
+                        <div>
+                            <input type="text" id="task_search" class="form-control form-control-sm" placeholder="Search tasks..." style="width:250px;">
+                        </div>
                     </div>
 
                     <div class="card section-card">
@@ -570,6 +587,46 @@ if (!function_exists('formatOverdue')) {
                 <!-- TAB: RECURRING (DataTable + AJAX server-side)         -->
                 <!-- ===================================================== -->
                 <div class="task-tab-pane" id="tab-recurring">
+                    <div class="list-filter-pills rec_filter">
+                        <button class="pill active" data-filter="all">All</button>
+                        <button class="pill" data-filter="overdue">Overdue</button>
+                        <button class="pill" data-filter="today">Today</button>
+                        <button class="pill" data-filter="week">This week</button>
+                        <button class="pill" data-filter="high">High priority</button>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-2">
+                        <!-- LEFT: dropdowns -->
+                        <div class="list-filter-dropdowns d-flex gap-2 align-items-center">
+                            <select class="form-select form-select-sm w-auto" id="rec_list_dept_filter">
+                                <option value="">All departments</option>
+                                <?php
+                                $ld_res = $con->query("SELECT id, department_name FROM departments ORDER BY department_name");
+                                if ($ld_res) {
+                                    while ($ld = $ld_res->fetch_assoc()) {
+                                        echo '<option value="'.(int)$ld['id'].'">'.htmlspecialchars($ld['department_name']).'</option>';
+                                    }
+                                }
+                                ?>
+                            </select>
+
+                            <select class="form-select form-select-sm w-auto" id="rec_list_freq_filter">
+                                <option value="">All frequencies</option>
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly">Monthly</option>
+                                <option value="specific">Specific</option>
+                                <option value="onetime">Onetime</option>
+                                <option value="recurring">Recurring</option>
+                            </select>
+
+                            <button class="btn btn-light-secondary btn-sm" id="rec_clear_list_filters">
+                                × Clear filters
+                            </button>
+                        </div>
+                        <div>
+                            <input type="text" id="rec_task_search" class="form-control form-control-sm" placeholder="Search tasks..." style="width:250px;">
+                        </div>
+                    </div>
                     <div class="d-flex justify-content-end mb-4">
                         <button class="btn btn-warning text-white" data-bs-toggle="modal" data-bs-target="#createTaskModal">+ Add recurring</button>
                     </div>
@@ -614,261 +671,489 @@ if (!function_exists('formatOverdue')) {
                     Most tasks are auto-created by the system when a previous
                     workflow step is completed.
                 </div>
-                <div class="row">
-                    <div class="col-md-4 mb-4">
-                        <label class="form-label">Department *</label>
-                        <select class="form-select" name="department_id" id="department_id">
-                            <option>Select</option>
-                            <?php if($department_list){
-                                    foreach($department_list as $single_dept){?>
-                                        <option value="<?php echo $single_dept['id']; ?>"><?php echo $single_dept['department_name']; ?></option>
-                                    <?php } } ?>
-                        </select>
-                    </div>
 
-                    <div class="col-md-4 mb-4">
-                        <label class="form-label">Task Type *</label>
-                        <select class="form-select">
-                            <option>Select</option>
-                            <option value="daily">Daily</option>
-                            <option value="weekly">Weekly</option>
-                            <option value="monthly">Monthly</option>
-                            <option value="project">Project</option>
-                            <option value="adhoc">Ad-hoc</option>
-                            <option value="recurring">Recurring</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-4 mb-4">
-                        <label class="form-label">Priority</label>
-                        <select class="form-select">
-                            <option>Medium</option>
-                            <option>High</option>
-                            <option>Low</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-12 mb-4">
-                        <label class="form-label">Task Title *</label>
-                        <input type="text" class="form-control" placeholder="Clear specific title">
-                    </div>
-
-                    <div class="col-md-6 mb-4">
-                        <label class="form-label">Assign To *</label>
-                        <select class="form-select">
-                            <option>Select Staff</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-6 mb-4">
-                        <label class="form-label">Assigned By</label>
-                        <select class="form-select">
-                            <option>Admin</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-4 mb-4">
-                        <label class="form-label">Start Date</label>
-                        <input type="date" class="form-control">
-                    </div>
-
-                    <div class="col-md-4 mb-4">
-                        <label class="form-label">Due Date</label>
-                        <input type="date" class="form-control">
-                    </div>
-
-                    <div class="col-md-4 mb-4">
-                        <label class="form-label">Est. Hours</label>
-                        <input type="number" class="form-control" placeholder="e.g. 4">
-                    </div>
-                </div>
-
-                <!-- Department Detail Card -->
-                <div id="department_fields_container">
-                    <div id="design_fields" class="dept-section d-none">
-                        <div class="department-card">
-                            <div class="department-card-header mb-6" style="font-weight: 600;">
-                                <i class="fas fa-palette"></i>
-                                Design Studio — task details
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <label>Design sub-type *</label>
-                                    <select class="form-select">
-                                        <option value="New creative">New creative</option>
-                                        <option value="Repeat / variation">Repeat / variation</option>
-                                        <option value="Admin reference">Admin reference</option>
-                                    </select>
-                                </div>
-
-                                <div class="col-md-4">
-                                    <label>Designer level</label>
-                                    <select class="form-select">
-                                        <option value="any">Any</option>
-                                        <option value="basic">Basic</option>
-                                        <option value="mid">Mid</option>
-                                        <option value="max">Max</option>
-                                        <option value="pro">Pro</option>
-                                    </select>
-                                </div>
-
-                                <div class="col-md-4">
-                                    <label>Sketch submit format</label>
-                                    <select class="form-select">
-                                        <option>Any</option>
-                                        <option>Paper sketch — photo</option>
-                                        <option>Digital file</option>
-                                        <option>Mood board</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="section-title mt-4">
-                                CATEGORY-WISE WEEKLY TARGETS
-                            </div>
-                            <table class="table table-bordered mt-2">
-                                <thead>
-                                    <tr>
-                                        <th width="55%">CATEGORY</th>
-                                        <th>WEEKLY</th>
-                                        <th>MONTHLY</th>
-                                        <th>BUDGET ₹</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="category_target_body">
-                                    <?php foreach($design_categories as $row){ ?>
-                                        <tr>
-                                            <td><?= $row['name']; ?><input type="hidden" name="category_id[]" value="<?= $row['id']; ?>"></td>
-                                            <td><input type="number" class="form-control" name="weekly_target[]" value=""></td>
-                                            <td><input type="number" class="form-control" name="monthly_target[]" value=""></td>
-                                            <td><input type="number" class="form-control" name="budget[]" value=""></td>
-                                        </tr>
-                                        <?php } ?>
-                                </tbody>
-                            </table>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <label>Fabric (optional)</label>
-                                    <input type="text" class="form-control" placeholder="e.g. Georgette, Silk">
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label>Work type</label>
-                                    <select class="form-select">
-                                        <option>Designers choice</option>
-                                    </select>
-                                </div>
-
-                                <div class="col-md-6 mt-3">
-                                    <label>Occasion</label>
-                                    <select class="form-select">
-                                        <option>Festive</option>
-                                        <option>Bridal</option>
-                                        <option>Party wear</option>
-                                        <option>Casual</option>
-                                    </select>
-                                </div>
-
-                                <div class="col-md-6 mt-3">
-                                    <label>Reference</label>
-                                    <select class="form-select">
-                                        <option>— None</option>
-                                    </select>
-                                </div>
-
-                                <div class="col-md-12 mt-3">
-                                    <label>Color palette</label>
-                                    <input type="text" class="form-control" placeholder="e.g. Jewel tones or Designers choice">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="purchase_fields" class="dept-section d-none">
-                        <!-- Purchase HTML -->
-                    </div>
-
-                    <div id="production_fields" class="dept-section d-none">
-                        <!-- Production HTML -->
-                    </div>
-
-                    <div id="qc_fields" class="dept-section d-none">
-                        <!-- QC HTML -->
-                    </div>
-
-                    <div id="dispatch_fields" class="dept-section d-none">
-                        <!-- Dispatch HTML -->
-                    </div>
-
-                </div>
-
-                <!-- Description -->
-                <div class="mt-5">
-                    <label class="form-label">Description</label>
-                    <textarea class="form-control" rows="4" placeholder="Instructions, context, expected output..."></textarea>
-                </div>
-                <hr class="my-5">
-                <div class="reminder-section">
-                    <div class="text-uppercase fw-bold fs-8 text-muted mb-3">
-                        Reminders
-                    </div>
+                <form id="createTaskForm">
 
                     <div class="row">
-
                         <div class="col-md-4 mb-4">
-                            <label class="form-label">
-                                Remind before deadline
-                            </label>
-
-                            <select class="form-select" name="remind_before">
-                                <option>1 day before</option>
-                                <option>2 days before</option>
-                                <option>3 days before</option>
-                                <option>1 week before</option>
+                            <label class="form-label">Department *</label>
+                            <select class="form-select" name="department_id" id="department_id">
+                                <option value="">Select</option>
+                                <?php if($department_list){
+                                        foreach($department_list as $single_dept){?>
+                                            <option value="<?php echo $single_dept['id']; ?>"><?php echo $single_dept['department_name']; ?></option>
+                                        <?php } } ?>
                             </select>
                         </div>
 
                         <div class="col-md-4 mb-4">
-                            <label class="form-label">
-                                Alert if not started by
-                            </label>
-
-                            <select class="form-select" name="alert_not_started">
-                                <option>50% time passed</option>
-                                <option>25% time passed</option>
-                                <option>75% time passed</option>
+                            <label class="form-label">Task Type *</label>
+                            <select class="form-select" name="task_type" id="task_type">
+                                <option value="">Select</option>
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly">Monthly</option>
+                                <option value="project">Project</option>
+                                <option value="adhoc">Ad-hoc</option>
+                                <option value="recurring">Recurring</option>
                             </select>
                         </div>
 
                         <div class="col-md-4 mb-4">
-                            <label class="form-label">
-                                Escalate if overdue
-                            </label>
-
-                            <select class="form-select" name="escalate_after">
-                                <option>After 1 day</option>
-                                <option>After 2 days</option>
-                                <option>After 3 days</option>
-                                <option>After 1 week</option>
+                            <label class="form-label">Priority</label>
+                            <select class="form-select" name="priority">
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                                <option value="low">Low</option>
                             </select>
                         </div>
 
+                        <div class="col-md-12 mb-4">
+                            <label class="form-label">Task Title *</label>
+                            <input type="text" name="task_title" id="task_title" class="form-control" placeholder="Clear specific title">
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label">Assign To *</label>
+                            <select class="form-select" id="assign_to" name="assign_to">
+                                <option value="">Select Staff</option>
+                                <?php if($staff_list){
+                                        foreach($staff_list as $single_staff){?>
+                                            <option value="<?php echo $single_staff['id']; ?>"><?php echo $single_staff['name']; ?></option>
+                                        <?php }
+                                } ?>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label">Assigned By</label>
+                            <select class="form-select" name="assigned_by">
+                                <option value="1">Admin</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4 mb-4">
+                            <label class="form-label">Start Date</label>
+                            <input type="date" name="start_date" id="start_date" class="form-control" value="<?php echo $current_date; ?>">
+                        </div>
+
+                        <div class="col-md-4 mb-4">
+                            <label class="form-label">Due Date *</label>
+                            <input type="date" class="form-control" name="due_date" id="due_date">
+                        </div>
+
+                        <div class="col-md-4 mb-4">
+                            <label class="form-label">Est. Hours</label>
+                            <input type="number" class="form-control" placeholder="e.g. 4" name="est_hours" id="est_hours">
+                        </div>
                     </div>
 
-                    <div class="alert alert-primary py-3 mb-0">
-                        <i class="fas fa-bell me-2"></i>
-                        All alerts in-app only. Staff notified immediately on task creation.
+                    <!-- Department Detail Card -->
+                    <div id="department_fields_container">
+                        <div id="design_fields" class="dept-section d-none">
+                            <div class="department-card">
+                                <div class="department-card-header mb-6" style="font-weight: 600;">
+                                    <i class="fas fa-palette"></i>
+                                    Design Studio — task details
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>Design sub-type *</label>
+                                        <select class="form-select" name="design[sub_type]" id="design_sub_type">
+                                            <option value="">Select</option>
+                                            <option value="New creative">New creative</option>
+                                            <option value="Repeat / variation">Repeat / variation</option>
+                                            <option value="Admin reference">Admin reference</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label>Designer level</label>
+                                        <select class="form-select" name="design[designer_level]">
+                                            <option value="any">Any</option>
+                                            <option value="basic">Basic</option>
+                                            <option value="mid">Mid</option>
+                                            <option value="max">Max</option>
+                                            <option value="pro">Pro</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label>Sketch submit format</label>
+                                        <select class="form-select" name="design[sketch_format]">
+                                            <option>Any</option>
+                                            <option>Paper sketch — photo</option>
+                                            <option>Digital file</option>
+                                            <option>Mood board</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="card border-0 shadow-sm mb-4 mt-6">
+                                    <div class="card-body mt-6">
+                                        <h6 class="text-uppercase fw-bold text-secondary mb-3" style="font-size: 13px; letter-spacing: .5px;">
+                                            Category-wise Weekly Targets
+                                        </h6>
+                                        <hr class="mt-0 mb-3">
+
+                                        <div class="row g-3 align-items-end">
+                                            <div class="col-md-4">
+                                                <label class="form-label small text-muted">Category</label>
+                                                <select id="category_select" class="form-select">
+                                                    <option value="">Select Category</option>
+                                                    <?php foreach ($design_categories as $row) { ?>
+                                                        <option value="<?= $row['id']; ?>"><?= $row['name']; ?></option>
+                                                    <?php } ?>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label small text-muted">Weekly</label>
+                                                <input type="number" min="0" class="form-control" id="weekly_target_input">
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label class="form-label small text-muted">Monthly</label>
+                                                <input type="number" min="0" class="form-control" id="monthly_target_input">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label small text-muted">Budget ₹</label>
+                                                <input type="number" min="0" class="form-control" id="budget_input">
+                                            </div>
+                                            
+                                            
+                                        </div>
+                                        
+                                        <div class="row g-3 align-items-end mt-1">
+                                            <div class="col-md-3">
+                                                <label class="form-label small text-muted">Fabric</label>
+                                                <select id="fabric_input" class="form-select">
+                                                    <option value="">Select Fabric</option>
+                                                    <?php foreach ($fabric_list as $single_fabric) { ?>
+                                                        <option value="<?= $single_fabric['id']; ?>"><?= $single_fabric['name']; ?></option>
+                                                    <?php } ?>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label small text-muted">Work type</label>
+                                                <select class="form-select" id="work_typr_input">
+                                                    <option>Select Work Type</option>
+                                                    <?php foreach ($jobwork_type_list as $single_val) { ?>
+                                                        <option value="<?= $single_val['id']; ?>"><?= $single_val['name']; ?></option>
+                                                    <?php } ?>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label small text-muted">Occasion</label>
+                                                <select class="form-select" id="ocassion_input">
+                                                    <option>Festive</option>
+                                                    <option>Bridal</option>
+                                                    <option>Party wear</option>
+                                                    <option>Casual</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label small text-muted">Reference</label>
+                                                <select class="form-select" id="reference_input">
+                                                    <option value="">— None</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label small text-muted">Color palette</label>
+                                                <input type="text" class="form-control" placeholder="e.g. Jewel tones or Designers choice" id="color_palette">
+                                            </div>
+                                            <div class="col-md-2">
+                                                <button type="button" id="add_category_btn" class="btn btn-primary w-100">
+                                                    Add
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>  
+                                </div>
+                                <div class="table-responsive mt-4">
+                                    <table class="table table-bordered align-middle mb-0" id="category_table">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Category</th>
+                                                <th>Weekly</th>
+                                                <th>Monthly</th>
+                                                <th>Budget ₹</th>
+                                                <th>Fabric</th>
+                                                <th>Work Type</th>
+                                                <th>Occasion</th>
+                                                <th>Reference</th>
+                                                <th>Color Palette</th>
+                                                <th width="50px">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="category_target_body">
+                                            <!-- rows added dynamically -->
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="row d-none">
+                                    <div class="col-md-6">
+                                        <label>Fabric (optional)</label>
+                                        <input type="text" class="form-control" name="design[fabric]" placeholder="e.g. Georgette, Silk">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label>Work type</label>
+                                        <select class="form-select" name="design[work_type]">
+                                            <option>Designers choice</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6 mt-3">
+                                        <label>Occasion</label>
+                                        <select class="form-select" name="design[occasion]">
+                                            <option>Festive</option>
+                                            <option>Bridal</option>
+                                            <option>Party wear</option>
+                                            <option>Casual</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6 mt-3">
+                                        <label>Reference</label>
+                                        <select class="form-select" name="design[reference_id]">
+                                            <option value="">— None</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-12 mt-3">
+                                        <label>Color palette</label>
+                                        <input type="text" class="form-control" placeholder="e.g. Jewel tones or Designers choice" name="design[color_palette]">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="purchase_fields" class="dept-section d-none">
+                            <div class="department-card">
+                                <div class="department-card-header mb-6" style="font-weight: 600;">
+                                    <i class="fas fa-cart"></i>
+                                    Purchase task type
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <label>Sub Type</label>
+                                        <select class="form-select" name="purchase[sub_type]">
+                                            <option value="">Select</option>
+                                            <option value="Individual PO task">Individual PO task</option>
+                                            <option value="Weekly procurement plan">Weekly procurement plan</option>
+                                            <option value="Auto stock-alert reorder">Auto stock-alert reorder</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="production_fields" class="dept-section d-none">
+                            <!-- Production HTML -->
+                        </div>
+
+                        <div id="qc_fields" class="dept-section d-none">
+                            <div class="department-card">
+                                <div class="department-card-header mb-6" style="font-weight: 600;">
+                                    <i class="fas fa-cart"></i>
+                                    QC — lot task with alteration follow-up
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 mt-3">
+                                        <label>Lot Number *</label>
+                                        <input type="text" class="form-control" name="qc[lot_number]" id="qc_lot_number" placeholder="e.g. QC-204">
+                                    </div>
+                                    <div class="col-md-4 mt-3">
+                                        <label>Design Code *</label>
+                                        <input type="text" class="form-control" name="qc[design_code]" id="qc_design_code" placeholder="e.g. BK-LEH-25-0089">
+                                    </div>
+                                    <div class="col-md-4 mt-3">
+                                        <label>Total Pieces *</label>
+                                        <input type="text" class="form-control" name="qc[total_pieces]" id="qc_total_pieces" placeholder="e.g. 40">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 mt-3">
+                                        <label>Daily target</label>
+                                        <input type="text" class="form-control" name="qc[daily_target]" placeholder="e.g. 20">
+                                    </div>
+                                    <div class="col-md-4 mt-3">
+                                        <label>QC Inspector</label>
+                                        <select class="form-select" name="qc[qc_inspector_id]">
+                                            <option value="">Select</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="dispatch_fields" class="dept-section d-none">
+                            <div class="department-card">
+                                <div class="department-card-header mb-6" style="font-weight: 600;">
+                                    <i class="fas fa-truck"></i>
+                                    Dispatch task
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>Channel</label>
+                                        <select class="form-select" name="dispatch[channel_id]">
+                                            <option value="">Select</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label>Orders Today</label>
+                                        <input type="text" class="form-control" name="dispatch[orders_today]" placeholder="e.g. 24">
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label>Sub Type</label>
+                                        <select class="form-select" name="dispatch[sub_type]">
+                                            <option value="Batch Dispatch">Batch Dispatch</option>
+                                            <option value="RTO follow-up">RTO follow-up</option>
+                                            <option value="Return QC">Return QC</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="sampling_fields" class="dept-section d-none">
+                            <div class="department-card">
+                                <div class="department-card-header mb-6" style="font-weight: 600;">
+                                    <i class="fas fa-palette"></i>
+                                    Sampling — staged task
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>Design code *</label>
+                                        <input type="text" name="sampling[design_code]" id="sampling_design_code" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label>Farma Master</label>
+                                        <select class="form-select" name="sampling[farma_master_id]">
+                                            <option value="">Select</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label>Sample Due Date</label>
+                                        <input type="date" class="form-control" name="sampling[sample_due_date]">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
+
+                    <!-- Description -->
+                    <div class="mt-5">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" name="description" rows="4" placeholder="Instructions, context, expected output..."></textarea>
+                    </div>
+                    <hr class="my-5">
+                    <div class="reminder-section">
+                        <div class="text-uppercase fw-bold fs-8 text-muted mb-3">
+                            Reminders
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-4">
+                                <label class="form-label">Remind before deadline</label>
+                                <select class="form-select" name="remind_before">
+                                    <option>1 day before</option>
+                                    <option>2 days before</option>
+                                    <option>3 days before</option>
+                                    <option>1 week before</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4 mb-4">
+                                <label class="form-label">Alert if not started by</label>
+                                <select class="form-select" name="alert_not_started">
+                                    <option>50% time passed</option>
+                                    <option>25% time passed</option>
+                                    <option>75% time passed</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4 mb-4">
+                                <label class="form-label">Escalate if overdue</label>
+                                <select class="form-select" name="escalate_after">
+                                    <option>After 1 day</option>
+                                    <option>After 2 days</option>
+                                    <option>After 3 days</option>
+                                    <option>After 1 week</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-primary py-3 mb-0">
+                            <i class="fas fa-bell me-2"></i>
+                            All alerts in-app only. Staff notified immediately on task creation.
+                        </div>
+                    </div>
+
+                </form>
+                <!-- form now closes here, AFTER everything -->
             </div>
             <div class="modal-footer">
-                <button class="btn btn-light" data-bs-dismiss="modal"> Cancel </button>
-                <button class="btn btn-secondary"> Save Draft</button>
-                <button class="btn btn-warning text-white">Create & Assign</button>
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-secondary" name="status" value="draft" form="createTaskForm">Save Draft</button>
+                <button type="submit" class="btn btn-warning text-white" form="createTaskForm">Create & Assign</button>
             </div>
         </div>
     </div>
+</div>
+<div id="quickAssignModal" class="qa-overlay" style="display:none;">
+  <div class="qa-modal">
+    <div class="qa-header">
+      <h3>⚡ Quick Assign Task</h3>
+      <button class="qa-close" onclick="closeQuickAssign()">✕</button>
+    </div>
+
+    <div class="qa-assignee-bar">
+      👤 <b>Assigning to: <span id="qaAssigneeName"></span></b> — <span id="qaAssigneeMeta"></span>
+    </div>
+
+    <form id="quickAssignForm">
+      <input type="hidden" id="qaUserId" name="user_id">
+
+      <label>Task title <span class="qa-req">*</span></label>
+      <input type="text" name="title" id="qaTitle" placeholder="What needs to be done?" required>
+
+      <div class="qa-row">
+        <div>
+          <label>Task type</label>
+          <select name="task_type" id="qaType">
+            <option value="adhoc">Ad-hoc</option>
+            <option value="followup">Follow-up</option>
+            <option value="recurring">Recurring</option>
+          </select>
+        </div>
+        <div>
+          <label>Due date <span class="qa-req">*</span></label>
+          <input type="date" name="due_date" id="qaDueDate" required>
+        </div>
+      </div>
+
+      <label>Priority</label>
+      <select name="priority" id="qaPriority">
+        <option value="low">Low</option>
+        <option value="medium" selected>Medium</option>
+        <option value="high">High</option>
+      </select>
+
+      <label>Instructions</label>
+      <textarea name="instructions" id="qaInstructions" placeholder="What exactly should be done?"></textarea>
+
+      <div class="qa-footer">
+        <button type="button" class="qa-btn-cancel" onclick="closeQuickAssign()">Cancel</button>
+        <button type="submit" class="qa-btn-assign">➤ Assign now</button>
+      </div>
+    </form>
+  </div>
 </div>
 <div class="modal fade" id="confirmTaskModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
@@ -879,74 +1164,31 @@ if (!function_exists('formatOverdue')) {
                     <i class="fas fa-check-circle text-warning me-2"></i>
                     Confirm Task Completion
                 </h3>
-
-                <button type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
             <form id="confirmTaskForm">
-
                 <input type="hidden" name="task_id" id="confirm_task_id">
                 <div class="modal-body">
                     <div class="task-summary-box">
-                        <div class="fw-bold fs-4"
-                             id="confirm_task_title">
-                        </div>
-
-                        <div class="text-muted mt-1"
-                             id="confirm_task_info">
-                        </div>
-
+                        <div class="fw-bold fs-4"id="confirm_task_title"></div>
+                        <div class="text-muted mt-1" id="confirm_task_info"></div>
                     </div>
-
-                    <div class="section-title">
-                        STAFF COMPLETION NOTE
-                    </div>
-
-                    <div class="completion-note-box"
-                         id="staff_completion_note">
-                    </div>
-
+                    <div class="section-title">STAFF COMPLETION NOTE</div>
+                    <div class="completion-note-box" id="staff_completion_note"></div>
                     <div class="mb-4">
                         <label class="form-label">
                             Dept Head remarks (optional)
                         </label>
-
-                        <textarea class="form-control"
-                                  rows="4"
-                                  name="remarks"
-                                  placeholder="Observations, feedback..."></textarea>
+                        <textarea class="form-control" rows="4" id="confirm_remarks" name="confirm_remarks" placeholder="Observations, feedback..."></textarea>
                     </div>
-
                 </div>
-
                 <div class="modal-footer border-0">
-
-                    <button type="button"
-                            class="btn btn-light"
-                            data-bs-dismiss="modal">
-                        Cancel
-                    </button>
-
-                    <button type="button"
-                            class="btn btn-outline-warning"
-                            id="sendBackBtn">
-                        <i class="fas fa-undo me-1"></i>
-                        Send back
-                    </button>
-
-                    <button type="submit"
-                            class="btn btn-warning text-white">
-                        <i class="fas fa-check me-1"></i>
-                        Confirm done
-                    </button>
-
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-outline-warning" id="sendBackBtn"> <i class="fas fa-undo me-1"></i>Send back</button>
+                    <button type="button" class="btn btn-warning text-white" id="confirmTaskBtn"><i class="fas fa-check me-1"></i>Confirm done</button>
                 </div>
-
             </form>
-
         </div>
     </div>
 </div>
@@ -955,6 +1197,118 @@ if (!function_exists('formatOverdue')) {
 <script src="<?= $site_path ?>/assets/plugins/custom/datatables/datatables.bundle.js"></script>
 
 <script>
+    $(document).ready(function () {
+        $('#add_category_btn').on('click', function () {
+            let categoryId = $('#category_select').val();
+            let categoryName = $('#category_select option:selected').text();
+            let weekly = $('#weekly_target_input').val();
+            let monthly = $('#monthly_target_input').val();
+            let budget = $('#budget_input').val();
+            let fabric = $('#fabric_input').val();
+            let fabricName = $('#fabric_input option:selected').text();
+            let workType = $('#work_typr_input').val();
+            let workTypeName = $('#work_typr_input option:selected').text();
+            let occasion = $('#ocassion_input').val();
+            let referenceId = $('#reference_input').val();
+            let referenceName = $('#reference_input option:selected').text();
+            let colorPalette = $('#color_palette').val();
+
+            if (!categoryId) {
+                alert('Please select a category');
+                return;
+            }
+
+            if ($('#category_target_body tr[data-id="' + categoryId + '"]').length > 0) {
+                alert('This category is already added');
+                return;
+            }
+
+            let row = `
+            <tr data-id="${categoryId}">
+                <td>${categoryName}
+                    <input type="hidden" name="design[category_id][]" value="${categoryId}">
+                </td>
+                <td>${weekly || '-'}
+                    <input type="hidden" name="design[weekly_target][]" value="${weekly}">
+                </td>
+                <td>${monthly || '-'}
+                    <input type="hidden" name="design[monthly_target][]" value="${monthly}">
+                </td>
+                <td>${budget ? '₹' + budget : '-'}
+                    <input type="hidden" name="design[budget][]" value="${budget}">
+                </td>
+                <td>${fabricName || '-'}
+                    <input type="hidden" name="design[fabric][]" value="${fabric}">
+                </td>
+                <td>${workTypeName}
+                    <input type="hidden" name="design[work_type][]" value="${workType}">
+                </td>
+                <td>${occasion}
+                    <input type="hidden" name="design[occasion][]" value="${occasion}">
+                </td>
+                <td>${referenceName}
+                    <input type="hidden" name="design[reference_id][]" value="${referenceId}">
+                </td>
+                <td>${colorPalette || '-'}
+                    <input type="hidden" name="design[color_palette][]" value="${colorPalette}">
+                </td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-row">&times;</button>
+                </td>
+            </tr>`;
+
+            $('#category_target_body').append(row);
+
+            $('#category_select').val('');
+            $('#weekly_target_input, #monthly_target_input, #budget_input, #fabric_input, #color_palette').val('');
+            $('#work_typr_input, #ocassion_input, #reference_input').prop('selectedIndex', 0);
+        });
+
+        $(document).on('click', '.remove-row', function () {
+            $(this).closest('tr').remove();
+        });
+        //confirmTaskBtn
+        $("#sendBackBtn").on('click',function(){
+            $.ajax({
+                url: '<?php echo $site_path; ?>/ajax/add-update-task-details',
+                type: 'POST',
+                data: {action: 'rework-task',task_id : $("#confirm_task_id").val(),remarks : $("#confirm_remarks").val(),status : 'Resubmission'},
+                dataType: 'json',
+                success: function (response) {
+                    if (response.status == 'success') {
+                        alert(response.message);
+                        window.location.reload();
+                    } else {
+                        alert("Ajax Error");
+                    }
+                },
+                error: function () {
+                    alert("Ajax Error");
+                }
+            });
+        });
+        
+        $("#confirmTaskBtn").on('click',function(){
+            $.ajax({
+                url: '<?php echo $site_path; ?>/ajax/add-update-task-details',
+                type: 'POST',
+                data: {action: 'complete-task',task_id : $("#confirm_task_id").val(),remarks : $("#confirm_remarks").val(),status : 'Completed'},
+                dataType: 'json',
+                success: function (response) {
+                    if (response.status == 'success') {
+                        alert(response.message);
+                        window.location.reload();
+                    } else {
+                        alert("Ajax Error");
+                    }
+                },
+                error: function () {
+                    alert("Ajax Error");
+                }
+            });
+        });
+    });
+     
 (function () {
     /* ---------- Tab switching ---------- */
     const tabs  = document.querySelectorAll('.task-tab');
@@ -1028,7 +1382,7 @@ if (!function_exists('formatOverdue')) {
                 { data: 'task_type',   orderable: true  },
                 { data: 'priority',    orderable: true  },
                 { data: 'department',  orderable: true  },
-                { data: 'assigned_to', orderable: false },
+                { data: 'assigned_to', orderable: true },
                 { data: 'due',         orderable: true  },
                 { data: 'status',      orderable: true  },
                 { data: 'actions',     orderable: false, searchable: false },
@@ -1050,6 +1404,10 @@ if (!function_exists('formatOverdue')) {
     $("#list_freq_filter").on('change',function(){
         taskListTable.ajax.realod();
     });
+    
+    $("#task_search").on('keyup',function(){
+         taskListTable.search(this.value).draw();
+    });
 
     /* Re-fetch List table whenever a quick filter pill or dropdown changes */
     document.querySelectorAll('.list-filter-pills .pill').forEach(pill => {
@@ -1068,7 +1426,7 @@ if (!function_exists('formatOverdue')) {
         document.querySelectorAll('.list-filter-pills .pill').forEach((p, i) => p.classList.toggle('active', i === 0));
         if (window.taskListTable) window.taskListTable.ajax.reload();
     });
-
+    
     /* ===================================================================
        RECURRING TAB — DataTables server-side AJAX
        =================================================================== */
@@ -1078,31 +1436,104 @@ if (!function_exists('formatOverdue')) {
             serverSide: true,
             ajax: {
                 url: '<?= $site_path ?>/ajax/recurring-tasks-ajax',
-                type: 'POST'
+                type: 'POST',
+                data: function (d) {
+                    d.quick         = document.querySelector('.rec_filter .pill.active')?.dataset.filter || 'all';
+                    d.department_id = document.getElementById('rec_list_dept_filter')?.value || '';
+                    d.frequency     = document.getElementById('rec_list_freq_filter')?.value || '';
+                }
             },
             columns: [
                 { data: 'title',      orderable: true  },
                 { data: 'frequency',  orderable: true  },
                 { data: 'department', orderable: true  },
                 { data: 'assignee',   orderable: false },
-                { data: 'next_run',        orderable: true  },
+                { data: 'next_run',   orderable: true  },
                 { data: 'status',     orderable: true  },
                 { data: 'actions',    orderable: false, searchable: false },
             ],
             order: [[4, 'asc']],
             pageLength: 10,
             lengthMenu: [10, 25, 50, 100],
+            drawCallback: function () {
+                KTMenu.createInstances();
+            },
             language: { search: '', searchPlaceholder: 'Search recurring tasks...' }
         });
     };
+    $("#rec_list_dept_filter").on('change',function(){
+        window.recurringTable.ajax.reload();
+
+    });
+    
+    $("#rec_list_freq_filter").on('change',function(){
+        window.recurringTable.ajax.reload();
+
+    });
+    
+    $("#rec_task_search").on('keyup',function(){
+         window.recurringTable.search(this.value).draw();
+    });
+    
+    document.querySelectorAll('.rec_filter .pill').forEach(pill => {
+        pill.addEventListener('click', function () {
+            document.querySelectorAll('.rec_filter .pill').forEach(p => p.classList.remove('active'));
+            this.classList.add('active');
+            if (window.recurringTable) window.recurringTable.ajax.reload();
+        });
+    });
+    
+    document.getElementById('rec_list_dept_filter')?.addEventListener('change', () => window.recurringTable?.ajax.reload());
+    document.getElementById('list_freq_filter')?.addEventListener('change', () => window.recurringTable?.ajax.reload());
+    
+    document.getElementById('rec_clear_list_filters')?.addEventListener('click', function () {
+        document.getElementById('rec_list_dept_filter').value = '';
+        document.getElementById('rec_list_freq_filter').value = '';
+        document.querySelectorAll('.rec_filter .pill').forEach((p, i) => p.classList.toggle('active', i === 0));
+        if (window.recurringTable) window.recurringTable.ajax.reload();
+    });
+    
 })();
+
+    
 
 function viewTask(id) {
     window.location.href = '<?php echo $site_path; ?>/view-task?id=' + id;
 }
-function quickAssign(staffId) {
-    openCreateTaskModal({ assigned_to: staffId });
+function quickAssign(userId, userName, activeTasksCount) {
+  document.getElementById('qaUserId').value = userId;
+  document.getElementById('qaAssigneeName').textContent = userName || ('User #' + userId);
+  document.getElementById('qaAssigneeMeta').textContent =
+    activeTasksCount > 0 ? activeTasksCount + ' active task(s)' : 'no active tasks';
+
+  document.getElementById('quickAssignForm').reset();
+  document.getElementById('qaUserId').value = userId; // reset clears hidden field too, reset after
+  document.getElementById('quickAssignModal').style.display = 'flex';
 }
+
+function closeQuickAssign() {
+  document.getElementById('quickAssignModal').style.display = 'none';
+}
+
+document.getElementById('quickAssignForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const formData = new FormData(this);
+
+  fetch('<?php $site_path; ?>/ajax/assign-task', {
+    method: 'POST',
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      closeQuickAssign();
+      location.reload(); // or update UI without reload
+    } else {
+      alert(data.message || 'Failed to assign task.');
+    }
+  })
+  .catch(() => alert('Something went wrong.'));
+});
 function createDeptTask(deptId) {
     openCreateTaskModal({ department_id: deptId });
 }
@@ -1120,6 +1551,23 @@ function pauseRecurring(id) {
         window.location.href = '<?php echo $site_path; ?>/pause-recurring-task?id=' + id;
     }
 }
+
+$("#task_type").on('change',function(){
+    var task_type = $(this).val();
+    var today = new Date();
+    var dueDate = new Date(today);
+    if(task_type == 'daily'){
+        dueDate.setDate(today.getDate());
+    }else if(task_type == 'weekly'){
+        dueDate.setDate(today.getDate() + 6);
+    }else if(task_type == 'monthly'){
+        dueDate.setMonth(today.getMonth() + 1);
+    }
+    var formattedDate = dueDate.getFullYear() + '-' +
+        String(dueDate.getMonth() + 1).padStart(2, '0') + '-' +
+        String(dueDate.getDate()).padStart(2, '0');
+    $("#due_date").val(formattedDate);    
+});
 $('#department_id').on('change', function () {
 
     $('.dept-section').addClass('d-none');
@@ -1129,8 +1577,12 @@ $('#department_id').on('change', function () {
     if (department === '4') {
         $('#design_fields').removeClass('d-none');
     }
+    
+    if (department === '8') {
+        $('#sampling_fields').removeClass('d-none');
+    }
 
-    if (department === 'purchase') {
+    if (department === '10') {
         $('#purchase_fields').removeClass('d-none');
     }
 
@@ -1138,13 +1590,48 @@ $('#department_id').on('change', function () {
         $('#production_fields').removeClass('d-none');
     }
 
-    if (department === 'qc') {
+    if (department === '11') {
         $('#qc_fields').removeClass('d-none');
     }
 
-    if (department === 'dispatch') {
+    if (department === '3') {
         $('#dispatch_fields').removeClass('d-none');
     }
+    
+    let $assignTo = $('#assign_to');
+    $assignTo.html('<option value="">Loading...</option>').prop('disabled', true);
+
+    if (!department) {
+        $assignTo.html('<option value="">Select Department First</option>').prop('disabled', false);
+        return;
+    }
+    $.ajax({
+        url: '<?php echo $site_path; ?>/ajax/ajax-get-users-by-department',
+        method: 'GET',
+        data: { department_id: department},
+        dataType: 'json',
+        success: function (response) {
+            $assignTo.empty().prop('disabled', false);
+            $assignTo.append('<option value="">Select User</option>');
+
+            if (response.success && response.users.length > 0) {
+                $.each(response.users, function (i, user) {
+                    $assignTo.append(
+                        $('<option>', {
+                            value: user.id,
+                            text: user.name
+                        })
+                    );
+                });
+            } else {
+                $assignTo.append('<option value="">No users found</option>');
+            }
+        },
+        error: function () {
+            $assignTo.empty().prop('disabled', false);
+            $assignTo.append('<option value="">Error loading users</option>');
+        }
+    });
 
 });
 $(document).on('click','.review-confirm-btn',function(){
@@ -1169,6 +1656,189 @@ $(document).on('click','.review-confirm-btn',function(){
 
     $('#staff_completion_note').html(note);
 
+});
+
+// ---------- Department field show/hide ----------
+const deptFieldMap = {
+  // department_id : container id  -- adjust ids to match your actual department PKs
+  '4': 'design_fields',
+  '10': 'purchase_fields',
+  '3': 'production_fields',
+  '11': 'qc_fields',
+  '3': 'dispatch_fields',
+  '8': 'sampling_fields'
+};
+
+const conditionalRequiredFields = {
+  'design_fields': ['design_sub_type'] // add more field ids here for qc_fields, sampling_fields, etc.
+};
+
+document.getElementById('department_id').addEventListener('change', function () {
+  document.querySelectorAll('.dept-section').forEach(el => el.classList.add('d-none'));
+  const target = deptFieldMap[this.value];
+  if (target) document.getElementById(target).classList.remove('d-none');
+});
+
+// ---------- Validation ----------
+function clearErrors(form) {
+  form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+  form.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+}
+
+function showError(field, message) {
+  field.classList.add('is-invalid');
+  const msg = document.createElement('div');
+  msg.className = 'invalid-feedback d-block';
+  msg.textContent = message;
+  field.insertAdjacentElement('afterend', msg);
+}
+
+function validateTaskForm(form) {
+  clearErrors(form);
+  let isValid = true;
+
+  const required = [
+    { name: 'department_id', label: 'Department' },
+    { name: 'task_type', label: 'Task type' },
+    { name: 'task_title', label: 'Task title' },
+    { name: 'assign_to', label: 'Assignee' },
+    { name: 'due_date', label: 'Due date' }
+  ];
+
+  required.forEach(r => {
+    const field = form.querySelector(`[name="${r.name}"]`);
+    if (!field) return;
+    const val = field.value.trim();
+    if (!val || val === 'Select' || val === 'Select Staff') {
+      showError(field, r.label + ' is required.');
+      isValid = false;
+    }
+  });
+
+  // Date logic: due date can't be before start date
+  const startDate = form.querySelector('[name="start_date"]');
+  const dueDate = form.querySelector('[name="due_date"]');
+  if (startDate.value && dueDate.value && dueDate.value < startDate.value) {
+    showError(dueDate, 'Due date cannot be before start date.');
+    isValid = false;
+  }
+
+  // Department-specific required checks
+ 
+  const deptId = form.querySelector('[name="department_id"]').value;
+  if (deptId === '4') { // Design Studio
+    const field = form.querySelector('[name="design[sub_type]"]');
+    if (field && !field.value.trim()) {
+      showError(field, 'Design sub-type is required.');
+      isValid = false;
+    }
+ 
+    let anyTargetFilled = false;
+    
+
+    const rows = document.querySelectorAll('#category_target_body tr');
+
+    if (rows.length === 0) {
+      showError(document.getElementById('category_target_body'), 'No category rows found.');
+      isValid = false;
+    }
+
+    rows.forEach((row) => {
+      const wInput = row.querySelector('[name="design[weekly_target][]"]');
+      const mInput = row.querySelector('[name="design[monthly_target][]"]');
+      const bInput = row.querySelector('[name="design[budget][]"]');
+      const w = wInput ? wInput.value.trim() : '';
+      const m = mInput ? mInput.value.trim() : '';
+      const b = bInput ? bInput.value.trim() : '';
+
+      // check at least one filled
+      if (w || m || b) {
+        anyTargetFilled = true;
+      }
+
+      // negative validation
+      [wInput, mInput, bInput].forEach(inp => {
+        if (inp && inp.value.trim() !== '' && Number(inp.value) < 0) {
+          showError(inp, 'Value cannot be negative.');
+          isValid = false;
+        }
+      });
+    });
+
+    if (!anyTargetFilled) {
+      showError(document.getElementById('category_target_body'), 'Enter at least one category target.');
+      isValid = false;
+    }
+  }
+
+  if (deptId === '11') { // QC
+    ['qc[lot_number]', 'qc[design_code]', 'qc[total_pieces]'].forEach(name => {
+      const field = form.querySelector(`[name="${name}"]`);
+      if (field && !field.value.trim()) {
+        showError(field, 'This field is required for QC tasks.');
+        isValid = false;
+      }
+    });
+  }
+
+  if (deptId === '8') { // Sampling
+    const field = form.querySelector('[name="sampling[design_code]"]');
+    if (field && !field.value.trim()) {
+      showError(field, 'Design code is required for sampling tasks.');
+      isValid = false;
+    }
+  }
+
+  return isValid;
+}
+
+// ---------- AJAX submit ----------
+document.getElementById('createTaskForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  const form = this;
+
+  if (!validateTaskForm(form)) return;
+
+  const submitBtn = e.submitter || document.querySelector(`button[type="submit"][form="${form.id}"]`);
+  
+  const originalText = submitBtn.innerHTML;
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = 'Saving...';
+
+  const formData = new FormData(form);
+
+  fetch('<?php echo $site_path; ?>/ajax/assign-task', {
+    method: 'POST',
+    body: formData
+  })
+    .then(res => res.json())
+    .then(data => {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalText;
+
+      if (data.success) {
+        // Close modal (Bootstrap 5)
+        const modalEl = document.getElementById('createTaskModal');
+        bootstrap.Modal.getInstance(modalEl).hide();
+        form.reset();
+        // Refresh task list however your page does it
+        if (typeof refreshTaskList === 'function') refreshTaskList();
+        else location.reload();
+      } else if (data.errors) {
+        // Server-side validation errors keyed by field name
+        Object.keys(data.errors).forEach(fieldName => {
+          const field = form.querySelector(`[name="${fieldName}"]`);
+          if (field) showError(field, data.errors[fieldName]);
+        });
+      } else {
+        alert(data.message || 'Failed to create task.');
+      }
+    })
+    .catch(() => {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalText;
+      alert('Network error. Please try again.');
+    });
 });
 
 </script>

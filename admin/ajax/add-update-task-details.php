@@ -39,4 +39,30 @@ if ($action == 'add-design-details') {
     }else{
         echo json_encode(["status" => "error", "message" => "Error while create task."]);
     }
+}else if($action == 'rework-task'){
+    $task_id = $_POST['task_id'];
+    $remarks = $_POST['remarks'];
+    $status = $_POST['status'];
+    
+    $updstmt = $con->prepare("UPDATE task_master set status = ?, remarks = ? where id = ?");
+    $updstmt->bind_param("ssi",$status,$remarks,$task_id);
+    if($updstmt->execute()){
+        echo json_encode(["status" => "success", "message" => "Task Status Updated."]);
+    }else{
+        echo json_encode(["status" => "error", "message" => "Error while updating task"]);
+    }
+    
+}else if($action == 'complete-task'){
+    $task_id = $_POST['task_id'];
+    $remarks = $_POST['remarks'];
+    $status = $_POST['status'];
+    
+    $updstmt = $con->prepare("UPDATE task_master set status = ?, remarks = ? where id = ?");
+    $updstmt->bind_param("ssi",$status,$remarks,$task_id);
+    if($updstmt->execute()){
+        echo json_encode(["status" => "success", "message" => "Task Status Updated."]);
+    }else{
+        echo json_encode(["status" => "error", "message" => "Error while updating task"]);
+    }
+    
 }

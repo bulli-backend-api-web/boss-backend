@@ -1070,7 +1070,7 @@ function generateChallanNo()
 
 function generate_task_no(){
     global $con;
-    $date = date('Ymd');
+    $date = date('Y');
 
     /* Get today's last task */
     $sql = "SELECT task_no FROM task_master WHERE task_no LIKE 'TASK-$date-%' ORDER BY id DESC LIMIT 1";
@@ -1462,12 +1462,30 @@ function get_fabric_type_list(){
     return $fabric_type_list;
 }
 
+function get_jobwork_type_list(){
+    global $con;
+    $jobwork_type_list = [];
+    $sql = "SELECT id,name from jobwork_type order by name";
+    if ($stmt = mysqli_prepare($con, $sql)) {
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+
+        while ($row = mysqli_fetch_assoc($result)) {
+            $jobwork_type_list[] = $row;
+        }
+
+        mysqli_stmt_close($stmt);
+    }
+    
+    return $jobwork_type_list;
+}
+
 function get_register_staff_list() {
     global $con;
 
     $register_staff_list = [];
 
-    $sql  = "SELECT id, fullname FROM staff_register ORDER BY fullname ASC";
+    $sql  = "SELECT id, firstname FROM staff_register ORDER BY firstname ASC";
     $stmt = $con->prepare($sql);
 
     if (!$stmt) {
@@ -1508,4 +1526,28 @@ function get_employment_type_list() {
     $stmt->close();
 
     return $employment_type_list;
+}
+
+function get_staff_exp_level_list() {
+    global $con;
+
+    $staff_exp_level_list = [];
+
+    $sql  = "SELECT id, name FROM staff_exp_level ORDER BY id ASC";
+    $stmt = $con->prepare($sql);
+
+    if (!$stmt) {
+        return $staff_exp_level_list;
+    }
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    while ($row = $result->fetch_assoc()) {
+        $staff_exp_level_list[] = $row;
+    }
+
+    $stmt->close();
+
+    return $staff_exp_level_list;
 }
