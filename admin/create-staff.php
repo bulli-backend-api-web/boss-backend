@@ -7,6 +7,7 @@ $emp_id = generate_staff_code();
 $department_list = getAllDepartments();
 $role_list = getUniqueRoles();
 $employment_type_list = get_employment_type_list();
+$staff_exp_level = get_staff_exp_level_list();
 ?>
 <link href="<?php echo $site_path; ?>/assets/css/staff-register.css?v=<?php echo time(); ?>" rel="stylesheet" type="text/css" />
 <div class="app-main flex-column flex-row-fluid" id="kt_app_main">
@@ -177,9 +178,7 @@ $employment_type_list = get_employment_type_list();
                                             <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#departmentModal" class="quick-add-link"> + Quick Add</a>
                                         </div>
 
-                                        <select id="department_id"
-                                                name="department_id"
-                                                class="form-control form-control-lg form-control-solid" required>
+                                        <select id="department_id" name="department_id" class="form-control form-control-lg form-control-solid" required>
                                             <option value="">Select department</option>
 
                                             <?php foreach ($department_list as $dept) { ?>
@@ -191,7 +190,6 @@ $employment_type_list = get_employment_type_list();
 
                                     </div>
                                     <div class="field fv-row mb-4" id="f-gender">
-
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <label>Role / Designation <span class="req">*</span></label>
                                             <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#roleModal" class="quick-add-link"> + Quick Add</a>
@@ -230,7 +228,7 @@ $employment_type_list = get_employment_type_list();
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row col-2">
+                                <div class="row col-3">
                                     <div class="field fv-row mb-4" id="f-gender">
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <label>Employment <span class="req">*</span></label>
@@ -242,11 +240,26 @@ $employment_type_list = get_employment_type_list();
                                                 foreach ($employment_type_list as $single_val) {
                                                     ?>
                                                     <option value="<?php echo $single_val['id']; ?>"><?php echo $single_val['name']; ?></option>
-    <?php }
-}
-?>
+                                                    <?php }
+                                                }
+                                                ?>
                                         </select>
-                                        <span class="field-error">Gender is required</span>
+                                    </div>
+                                    <div class="field fv-row mb-4" id="f-gender">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <label>Exp Level</label>
+                                            <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#expLevelTypeModal" class="quick-add-link"> + Quick Add</a>
+                                        </div>
+                                        <select id="exp_level" name="exp_level" class="form-control form-control-lg form-control-solid">
+                                            <?php
+                                            if ($staff_exp_level) {
+                                                foreach ($staff_exp_level as $single_val) {
+                                                    ?>
+                                                    <option value="<?php echo $single_val['id']; ?>"><?php echo $single_val['name']; ?></option>
+                                                    <?php }
+                                                }
+                                                ?>
+                                        </select>
                                     </div>
                                     <div class="field fv-row mb-4" id="f-gender">
                                         <label>Work location</label>
@@ -659,6 +672,7 @@ $employment_type_list = get_employment_type_list();
         </div>
     </div>
 </div>
+
 <div class="modal fade" id="employmentTypeModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -670,6 +684,23 @@ $employment_type_list = get_employment_type_list();
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" id="saveEmploymentType">
+                    Save
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="expLevelTypeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Exp. Level</h3>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="exp_level_name" class="form-control" placeholder="Exp. Level">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="saveExpLevel">
                     Save
                 </button>
             </div>
@@ -935,6 +966,27 @@ $employment_type_list = get_employment_type_list();
             }
         });
 
+    });
+    
+    $("#saveExpLevel").click(function(){
+        let exp_level_name = $('#exp_level_name').val();
+        if (exp_level_name == '') {
+            alert('Enter Name');
+            return false;
+        }
+        $.ajax({
+            url: '<?php echo $site_path; ?>/ajax/add-update-exp-level-type',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                name: exp_level_name,
+                action: 'add-exp-level-type'
+            },
+            success: function (res) {
+                $('#exp_level_name').append(`<option value="${res.id}" selected>${$('#exp_level_name').val()}</option>`);
+                $('#expLevelTypeModal').modal('hide');
+            }
+        });
     });
     
     /* Genearate Review */

@@ -1551,3 +1551,82 @@ function get_staff_exp_level_list() {
 
     return $staff_exp_level_list;
 }
+
+function generate_ref_library_code(){
+    global $con;
+    $result = mysqli_query($con, "SELECT COUNT(*) AS total FROM reference_library");
+    $row    = mysqli_fetch_assoc($result);
+    $count  = (int) $row['total'];
+    return "REF - ". str_pad($count + 1, 3, '0', STR_PAD_LEFT);
+}
+
+function fetch_ref_library(){
+    global $con;
+    $refs = [];
+
+    $sql = "SELECT code, name, photo, tags FROM reference_library ORDER BY id DESC";
+    $result = $con->query($sql);
+
+    while ($row = $result->fetch_assoc()) {
+
+        $refs[] = [
+            'code'   => $row['code'],
+            'title'  => $row['name'],
+            'tags'   => !empty($row['tags']) ? explode(',', $row['tags']) : [],
+            'image'  => !empty($row['photo'])
+                            ? 'uploads/reference_library/' . $row['photo']
+                            : 'assets/media/misc/1.png',
+            'rating' => 5, // or fetch from DB if available
+            'count'  => 1  // or fetch from DB if available
+        ];
+    }
+    return $refs;
+}
+
+function get_collection_list() {
+    global $con;
+
+    $collection_list = [];
+
+    $sql  = "SELECT id, name FROM collections ORDER BY id ASC";
+    $stmt = $con->prepare($sql);
+
+    if (!$stmt) {
+        return $collection_list;
+    }
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    while ($row = $result->fetch_assoc()) {
+        $collection_list[] = $row;
+    }
+
+    $stmt->close();
+
+    return $collection_list;
+}
+
+function get_reference_type_list() {
+    global $con;
+
+    $reference_type_list = [];
+
+    $sql  = "SELECT id, name FROM reference_type ORDER BY id ASC";
+    $stmt = $con->prepare($sql);
+
+    if (!$stmt) {
+        return $reference_type_list;
+    }
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    while ($row = $result->fetch_assoc()) {
+        $reference_type_list[] = $row;
+    }
+
+    $stmt->close();
+
+    return $reference_type_list;
+}

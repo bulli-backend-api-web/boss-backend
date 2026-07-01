@@ -6,34 +6,34 @@ if (!is_readable($envFile)) {
     $envFile = dirname(__DIR__, 3) . '/.env';
 }
 
-if (is_readable($envFile)) {
-    foreach (file($envFile, FILE_IGNORE_NEW_LINES) as $line) {
-        $line = trim($line);
+//if (is_readable($envFile)) {
+//    foreach (file($envFile, FILE_IGNORE_NEW_LINES) as $line) {
+//        $line = trim($line);
+//
+//        if ($line === '' || str_starts_with($line, '#') || !str_contains($line, '=')) {
+//            continue;
+//        }
+//
+//        [$key, $val] = explode('=', $line, 2);
+//        $key = trim($key);
+//        $val = trim($val);
+//
+//        if (
+//            (str_starts_with($val, '"') && str_ends_with($val, '"')) ||
+//            (str_starts_with($val, "'") && str_ends_with($val, "'"))
+//        ) {
+//            $val = substr($val, 1, -1);
+//        }
+//
+//        $_ENV[$key] = $val;
+//        putenv("$key=$val");
+//    }
+//}
 
-        if ($line === '' || str_starts_with($line, '#') || !str_contains($line, '=')) {
-            continue;
-        }
-
-        [$key, $val] = explode('=', $line, 2);
-        $key = trim($key);
-        $val = trim($val);
-
-        if (
-            (str_starts_with($val, '"') && str_ends_with($val, '"')) ||
-            (str_starts_with($val, "'") && str_ends_with($val, "'"))
-        ) {
-            $val = substr($val, 1, -1);
-        }
-
-        $_ENV[$key] = $val;
-        putenv("$key=$val");
-    }
-}
-
-$host = $isCli ? 'localhost' : ($_ENV['DB_HOST'] ?? 'localhost');
-$username = $_ENV['DB_USERNAME'] ?? $_ENV['DB_USER'] ?? '';
-$password = $_ENV['DB_PASSWORD'] ?? '';
-$db_name = $_ENV['DB_NAME'] ?? '';
+$host = 'localhost';
+$username = 'root';
+$password = '';
+$db_name = 'bullionknot';
 
 $con = mysqli_connect($host, $username, $password, $db_name);
 mysqli_set_charset($con, "utf8mb4");
@@ -51,8 +51,8 @@ session_start();
 
 // --- Common values ---
 $define_company_name    = 'BullionKnot';
-$define_company_website = 'https://bullionknot.co/';
-$site_path = 'admin';
+$define_company_website = 'http://localhost/boss-backend/';
+$site_path = 'http://localhost/boss-backend/admin';
 $softtitle="E-commerce Web Panel";
 
 $task_type = [

@@ -354,7 +354,7 @@ if (!function_exists('formatOverdue')) {
                                 <div class="idle-staff-name"><?= htmlspecialchars($is['name']) ?></div>
                                 <div class="idle-staff-role text-muted"><?= htmlspecialchars($is['typee'] ?? '') ?> &middot; <?= htmlspecialchars($is['department_name'] ?? 'Unassigned') ?></div>
                                 <div class="idle-staff-time text-muted"><i class="ki-duotone ki-time fs-7"></i> All day today</div>
-                                <button class="btn-quick-assign" <button class="btn-quick-assign" onclick="quickAssign(<?= $is['id'] ?>, '<?= htmlspecialchars($is['name']) ?>', <?= $is['active_tasks'] ?? 0 ?>)">⚡ Quick assign task</button>
+                                <button class="btn-quick-assign" <button class="btn-quick-assign"  data-bs-toggle="modal" data-bs-target="#createTaskModal">⚡ Quick assign task</button>
                             </div>
                         <?php endforeach; else: ?>
                             <div class="text-center text-muted py-4">No idle staff right now &mdash; everyone has active tasks.</div>
@@ -675,7 +675,7 @@ if (!function_exists('formatOverdue')) {
                 <form id="createTaskForm">
 
                     <div class="row">
-                        <div class="col-md-4 mb-4">
+                        <div class="col-md-3 mb-4">
                             <label class="form-label">Department *</label>
                             <select class="form-select" name="department_id" id="department_id">
                                 <option value="">Select</option>
@@ -686,7 +686,7 @@ if (!function_exists('formatOverdue')) {
                             </select>
                         </div>
 
-                        <div class="col-md-4 mb-4">
+                        <div class="col-md-3 mb-4">
                             <label class="form-label">Task Type *</label>
                             <select class="form-select" name="task_type" id="task_type">
                                 <option value="">Select</option>
@@ -698,8 +698,22 @@ if (!function_exists('formatOverdue')) {
                                 <option value="recurring">Recurring</option>
                             </select>
                         </div>
+                        
+                        <div class="col-md-2 mb-4 d-none" id="recuringType">
+                            <label class="form-label">Recurring Every</label>
+                            <select class="form-select" name="recurring_type">
+                                <option value="medium">Days</option>
+                                <option value="high">Month</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-2 mb-4 d-none" id="recurringValue">
+                            <label class="form-label">Days / Month</label>
+                            <input type="text" name="recurring_interval" id="recurring_interval" class="form-control" placeholder="e.g.1">
+                        </div>
+                        
 
-                        <div class="col-md-4 mb-4">
+                        <div class="col-md-2 mb-4">
                             <label class="form-label">Priority</label>
                             <select class="form-select" name="priority">
                                 <option value="medium">Medium</option>
@@ -894,19 +908,19 @@ if (!function_exists('formatOverdue')) {
                                 <div class="row d-none">
                                     <div class="col-md-6">
                                         <label>Fabric (optional)</label>
-                                        <input type="text" class="form-control" name="design[fabric]" placeholder="e.g. Georgette, Silk">
+                                        <input type="text" class="form-control" placeholder="e.g. Georgette, Silk">
                                     </div>
 
                                     <div class="col-md-6">
                                         <label>Work type</label>
-                                        <select class="form-select" name="design[work_type]">
+                                        <select class="form-select">
                                             <option>Designers choice</option>
                                         </select>
                                     </div>
 
                                     <div class="col-md-6 mt-3">
                                         <label>Occasion</label>
-                                        <select class="form-select" name="design[occasion]">
+                                        <select class="form-select">
                                             <option>Festive</option>
                                             <option>Bridal</option>
                                             <option>Party wear</option>
@@ -916,14 +930,14 @@ if (!function_exists('formatOverdue')) {
 
                                     <div class="col-md-6 mt-3">
                                         <label>Reference</label>
-                                        <select class="form-select" name="design[reference_id]">
+                                        <select class="form-select">
                                             <option value="">— None</option>
                                         </select>
                                     </div>
 
                                     <div class="col-md-12 mt-3">
                                         <label>Color palette</label>
-                                        <input type="text" class="form-control" placeholder="e.g. Jewel tones or Designers choice" name="design[color_palette]">
+                                        <input type="text" class="form-control" placeholder="e.g. Jewel tones or Designers choice">
                                     </div>
                                 </div>
                             </div>
@@ -1062,29 +1076,29 @@ if (!function_exists('formatOverdue')) {
                             <div class="col-md-4 mb-4">
                                 <label class="form-label">Remind before deadline</label>
                                 <select class="form-select" name="remind_before">
-                                    <option>1 day before</option>
-                                    <option>2 days before</option>
-                                    <option>3 days before</option>
-                                    <option>1 week before</option>
+                                    <option value="1 day before">1 day before</option>
+                                    <option value="2 days before">2 days before</option>
+                                    <option value="3 days before">3 days before</option>
+                                    <option value="1 week before">1 week before</option>
                                 </select>
                             </div>
 
                             <div class="col-md-4 mb-4">
                                 <label class="form-label">Alert if not started by</label>
                                 <select class="form-select" name="alert_not_started">
-                                    <option>50% time passed</option>
-                                    <option>25% time passed</option>
-                                    <option>75% time passed</option>
+                                    <option value="50% time passed">50% time passed</option>
+                                    <option value="25% time passed">25% time passed</option>
+                                    <option value="75% time passed">75% time passed</option>
                                 </select>
                             </div>
 
                             <div class="col-md-4 mb-4">
                                 <label class="form-label">Escalate if overdue</label>
                                 <select class="form-select" name="escalate_after">
-                                    <option>After 1 day</option>
-                                    <option>After 2 days</option>
-                                    <option>After 3 days</option>
-                                    <option>After 1 week</option>
+                                    <option value="After 1 day">After 1 day</option>
+                                    <option value="After 2 days">After 2 days</option>
+                                    <option value="After 3 days">After 3 days</option>
+                                    <option value="After 1 week">After 1 week</option>
                                 </select>
                             </div>
                         </div>
@@ -1556,12 +1570,18 @@ $("#task_type").on('change',function(){
     var task_type = $(this).val();
     var today = new Date();
     var dueDate = new Date(today);
+    $("#recuringType").addClass('d-none');
+    $("#recurringValue").addClass('d-none');
     if(task_type == 'daily'){
         dueDate.setDate(today.getDate());
     }else if(task_type == 'weekly'){
         dueDate.setDate(today.getDate() + 6);
     }else if(task_type == 'monthly'){
         dueDate.setMonth(today.getMonth() + 1);
+    }
+    if(task_type == 'recurring'){
+        $("#recuringType").removeClass('d-none');
+        $("#recurringValue").removeClass('d-none');
     }
     var formattedDate = dueDate.getFullYear() + '-' +
         String(dueDate.getMonth() + 1).padStart(2, '0') + '-' +
